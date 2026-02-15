@@ -3,147 +3,122 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Prépa Services</title>
+  <title>Prépa Stock</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+
   <header class="topbar">
     <div class="brand">
       <div class="logo">📦</div>
       <div>
-        <div class="title">Prépa Services</div>
-        <div class="subtitle">Base JSON → dotations → reste → prépa</div>
+        <div class="title">Prépa Stock</div>
+        <div class="subtitle">Saisie → Prépa → Consommation</div>
       </div>
     </div>
 
-    <nav class="tabs" aria-label="Navigation">
-      <button class="tab active" data-tab="products">Produits</button>
-      <button class="tab" data-tab="services">Services</button>
-      <button class="tab" data-tab="dotations">Dotations</button>
+    <div class="tabs">
+      <!-- 🔥 Onglets Produits & Services retirés de l'UI (mais code conservé) -->
+      <!-- <button class="tab" data-tab="products">Produits</button> -->
+      <!-- <button class="tab" data-tab="services">Services</button> -->
+
+      <button class="tab active" data-tab="dotations">Dotations</button>
       <button class="tab" data-tab="entry">Saisie</button>
       <button class="tab" data-tab="prep">Prépa</button>
-    </nav>
+      <button class="tab" data-tab="consumption">Consommation</button>
+
+      <button class="btn ghost" id="reloadAll" style="margin-left:auto;">↻ Recharger JSON</button>
+    </div>
+
+    <div class="muted" style="margin-top:8px" id="productsLoadStatus"></div>
   </header>
 
-  <main class="container">
+  <!-- ========== PANELS ========== -->
 
-    <!-- PRODUITS -->
-    <section class="panel" id="tab-products">
-      <h2>Base produits (products.json)</h2>
-
+  <!-- (Cachés) Produits / Services : conservés dans le code -->
+  <section id="tab-products" class="panel hidden">
+    <div class="container">
       <div class="card">
         <div class="row space">
           <div>
-            <strong>Chargement</strong>
-            <div class="muted" id="productsLoadStatus">…</div>
-          </div>
-          <div class="row">
-            <button class="btn ghost" type="button" id="reloadAll">Recharger</button>
+            <div class="title">Produits</div>
+            <div class="subtitle muted" id="productsCount"></div>
           </div>
         </div>
-
-        <div class="muted footnote">
-          Modifie <strong>products.json / services.json / dotations.json / dotations_order.json</strong> puis recharge.
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <div class="row space">
-          <h3>Liste produits</h3>
-          <div class="muted" id="productsCount"></div>
-        </div>
-
         <div class="tableWrap">
           <table class="table" id="productsTable">
             <thead>
               <tr>
-                <th>Code</th>
-                <th>Nom</th>
-                <th>Catégorie</th>
-                <th>U/carton</th>
-                <th>U/pack</th>
+                <th>Code</th><th>Nom</th><th>Catégorie</th><th>U/carton</th><th>U/pack</th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- SERVICES -->
-    <section class="panel hidden" id="tab-services">
-      <h2>Services (services.json)</h2>
-
+  <section id="tab-services" class="panel hidden">
+    <div class="container">
       <div class="card">
+        <div class="title">Services</div>
         <div class="tableWrap">
           <table class="table" id="servicesTable">
             <thead>
-              <tr>
-                <th>Service</th>
-                <th>Produits (dotation)</th>
-              </tr>
+              <tr><th>Service</th><th>Nb produits</th></tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
-
-        <div class="muted footnote">
-          Les services sont chargés depuis <strong>services.json</strong>.
-        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- DOTATIONS -->
-    <section class="panel hidden" id="tab-dotations">
-      <h2>Dotations (dotations.json + dotations_order.json)</h2>
-
+  <!-- Dotations -->
+  <section id="tab-dotations" class="panel">
+    <div class="container">
       <div class="card">
         <div class="row space">
-          <label class="inline">
-            Service
+          <div>
+            <div class="title">Dotations</div>
+            <div class="subtitle muted">Ordre respecté (dotations_order.json)</div>
+          </div>
+          <div class="inline">
             <select id="d_service"></select>
-          </label>
-          <div class="muted">Affichage dans l’ordre d’emplacement.</div>
+          </div>
         </div>
 
         <div class="tableWrap">
           <table class="table" id="dotationsTable">
             <thead>
-              <tr>
-                <th>#</th>
-                <th>Code</th>
-                <th>Produit</th>
-                <th>Cible (unités)</th>
-                <th>Équivalent</th>
-              </tr>
+              <tr><th>#</th><th>Code</th><th>Produit</th><th>Dotation (u)</th><th class="muted">Équiv.</th></tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
+
+        <div class="footnote muted">
+          La dotation est stockée en unités dans dotations.json.
+        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- SAISIE (PACK + UNITE) -->
-    <section class="panel hidden" id="tab-entry">
-      <h2>Saisie (reste dans le service)</h2>
-
-      <button id="toggleFullscreenEntry" class="btn ghost">🔍 Plein écran</button>
-
+  <!-- Saisie -->
+  <section id="tab-entry" class="panel hidden">
+    <div class="container">
       <div class="card">
         <div class="row space">
-          <label class="inline">
-            Service
-            <select id="e_service"></select>
-          </label>
-
-          <div class="row">
-            <button class="btn ghost" type="button" id="clearEntry">Vider saisie</button>
+          <div>
+            <div class="title">Saisie</div>
+            <div class="subtitle muted">Tu saisis uniquement Pack si U/pack > 0, sinon Unités</div>
           </div>
-        </div>
-
-        <div class="muted footnote">
-          Règle : <strong>vide = rien à préparer</strong> • <strong>0 = plus rien</strong>
+          <div class="inline">
+            <select id="e_service"></select>
+            <button class="btn ghost" id="toggleFullscreenEntry">🔍 Plein écran</button>
+            <button class="btn ghost" id="clearEntry">🧹 Vider saisie</button>
+          </div>
         </div>
 
         <div class="tableWrap">
@@ -153,42 +128,42 @@
                 <th>#</th>
                 <th>Code</th>
                 <th>Produit</th>
-                <th>Packs restants</th>
-                <th>Unités restantes</th>
+                <th>Packs</th>
+                <th>Unités</th>
                 <th>À préparer</th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
+
+        <div class="footnote muted">
+          Astuce : laisse vide = rien à préparer. Mets 0 = il n’y en a plus.
+        </div>
       </div>
+    </div>
+  </section>
 
-     <!-- AJOUTE ÇA DANS index.html, DANS LA SECTION SAISIE (tab-entry), TOUT EN BAS AVANT </section> -->
-     <div id="entryReminder" class="stickyReminder hidden">
-        🧾 Pense à prendre les feuilles <strong>Épicerie</strong> + <strong>Diététiques</strong>
-     </div>
-
-    </section>
-
-    <!-- PREPA -->
-    <section class="panel hidden" id="tab-prep">
-      <h2>Préparation à faire</h2>
-
+  <!-- Prépa -->
+  <section id="tab-prep" class="panel hidden">
+    <div class="container">
       <div class="card">
         <div class="row space">
-          <label class="inline">
-            Service
-            <select id="p_service"></select>
-          </label>
+          <div>
+            <div class="title">Prépa</div>
+            <div class="subtitle muted" id="prepSummary"></div>
+          </div>
 
-          <div class="row">
-            <button class="btn ghost" type="button" id="uncheckAll">Tout décocher</button>
-            <button class="btn" type="button" id="checkAll">Tout cocher</button>
+          <div class="inline">
+            <select id="p_service"></select>
+            <button class="btn ghost" id="checkAll">✅ Tout cocher</button>
+            <button class="btn ghost" id="uncheckAll">↩︎ Tout décocher</button>
           </div>
         </div>
 
-        <div class="muted footnote">
-          1 produit = 1 ligne. Code + quantité bien visibles. (Astuce: laisse ton doigt sur “À préparer” pour voir l’équivalent)
+        <div class="row" style="margin-top:10px; gap:8px;">
+          <button class="btn" id="closeSave">✅ Clôturer + sauvegarder</button>
+          <button class="btn ghost" id="closeNoSave">🧹 Vider sans sauvegarder</button>
         </div>
 
         <div class="prepHeader">
@@ -197,14 +172,64 @@
           <div class="right">Préparé</div>
           <div class="center">Fait</div>
         </div>
-
         <div id="prepList" class="prepList"></div>
-        <div class="muted footnote" id="prepSummary"></div>
-        <div class="muted footnote">Ordre = <strong>dotations_order.json</strong>.</div>
-      </div>
-    </section>
 
-  </main>
+        <div class="footnote muted">
+          Clôturer + sauvegarder = enregistre la consommation (historique) puis remet à zéro saisie/prépa pour le service.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Consommation -->
+  <section id="tab-consumption" class="panel hidden">
+    <div class="container">
+      <div class="card">
+        <div class="row space">
+          <div>
+            <div class="title">Consommation</div>
+            <div class="subtitle muted">Semaine / Mois • Tous services réunis</div>
+          </div>
+
+          <div class="inline" style="flex-wrap:wrap;">
+            <select id="c_mode">
+              <option value="week">Semaine</option>
+              <option value="month">Mois</option>
+            </select>
+            <input id="c_date" type="date" />
+            <button class="btn ghost" id="c_export">Exporter CSV</button>
+            <button class="btn ghost" id="c_clear">Effacer historique</button>
+          </div>
+        </div>
+
+        <div class="footnote muted" id="c_range"></div>
+
+        <div class="tableWrap">
+          <table class="table" id="c_table_products">
+            <thead>
+              <tr><th>Code</th><th>Produit</th><th>Total (u)</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="tableWrap">
+          <table class="table" id="c_table_services">
+            <thead>
+              <tr><th>Service</th><th>Total (u)</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Bandeau rappel SAISIE -->
+  <div id="entryReminder" class="stickyReminder hidden">
+    <strong>Rappel :</strong> prendre les feuilles épicerie / diététiques 🧾
+  </div>
 
   <script src="app.js"></script>
 </body>

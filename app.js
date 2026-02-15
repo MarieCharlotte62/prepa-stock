@@ -1,13 +1,13 @@
 // app.js (COMPLET)
+// - Prépa tri: CARTONS -> PACKS -> PETIT PRODUIT (ordre interne conservé via dotations_order.json)
 // - Saisie: si U/pack>0 => saisie PACKS uniquement, sinon UNITÉS uniquement
-// - Prépa: "À préparer" affiche "Xu (Y cartons + Z packs)" si applicable
-// - Prépa: TRI dans l'ordre à préparer = CARTONS -> PACKS -> PETIT PRODUIT
-//          en gardant l'ordre interne défini par dotations_order.json
-// - Rappel Saisie visible uniquement sur l'onglet Saisie
+// - Consommation: clôture + sauvegarde écrit un log, affichable semaine/mois, export CSV
+// - Onglets Produits/Services retirés de l'UI mais panels + code gardés
 
-const K_ENTRY = "ps_entry_json_v5";        // { serviceId: { code: { p:"", u:"" } } }
-const K_DONE  = "ps_done_json_v8";         // { serviceId: { code: true } }
-const K_PREP  = "ps_prepared_json_v8";     // { serviceId: { code: number } }
+const K_ENTRY = "ps_entry_json_v6";        // { serviceId: { code: { p:"", u:"" } } }
+const K_DONE  = "ps_done_json_v9";         // { serviceId: { code: true } }
+const K_PREP  = "ps_prepared_json_v9";     // { serviceId: { code: number } }
+const K_LOG   = "ps_consumption_log_v1";   // [ {ts, serviceId, code, qtyU} ]
 
 let products = [];
 let services = [];
@@ -17,6 +17,7 @@ let dotationsOrder = {};
 let entry = load(K_ENTRY, {});
 let done  = load(K_DONE, {});
 let prepared = load(K_PREP, {});
+let logEvents = load(K_LOG, []);
 
 // ---------------- Helpers ----------------
 function load(key, fallback) {
@@ -43,7 +44,7 @@ function getService(id) {
   return services.find(s => String(s.id) === String(id)) || null;
 }
 function serviceName(id) {
-  return getService(id)?.name ?? "Service";
+  return getService(id)?.name ?? id ?? "Service";
 }
 
 function catLabel(c) {
@@ -113,11 +114,9 @@ function getOrderedCodesForService(sid) {
 // ---------------- Sticky reminder (SAISIE) ----------------
 function updateEntryReminderVisibility() {
   const reminder = document.getElementById("entryReminder");
-  if (!reminder) return;
-
   const entryPanel = document.getElementById("tab-entry");
-  const isVisible = entryPanel && !entryPanel.classList.contains("hidden");
-
+  if (!reminder || !entryPanel) return;
+  const isVisible = !entryPanel.classList.contains("hidden");
   reminder.classList.toggle("hidden", !isVisible);
 }
 
@@ -129,6 +128,7 @@ const panels = {
   dotations: document.getElementById("tab-dotations"),
   entry: document.getElementById("tab-entry"),
   prep: document.getElementById("tab-prep"),
+  consumption: document.getElementById("tab-consumption"),
 };
 
 tabButtons.forEach(btn => {
@@ -137,14 +137,15 @@ tabButtons.forEach(btn => {
     btn.classList.add("active");
 
     const t = btn.dataset.tab;
-    Object.values(panels).forEach(p => p.classList.add("hidden"));
-    panels[t].classList.remove("hidden");
+    Object.values(panels).forEach(p => p && p.classList.add("hidden"));
+    panels[t]?.classList.remove("hidden");
 
     if (t === "products") renderProducts();
     if (t === "services") renderServices();
     if (t === "dotations") { syncSelects(); renderDotations(); }
     if (t === "entry") { syncSelects(); renderEntry(); }
     if (t === "prep") { syncSelects(); renderPrep(); }
+    if (t === "consumption") { renderConsumption(); }
 
     updateEntryReminderVisibility();
   });
@@ -212,6 +213,7 @@ async function loadAll(showAlert = false) {
     renderDotations();
     renderEntry();
     renderPrep();
+    renderConsumption();
 
     updateEntryReminderVisibility();
 
@@ -219,12 +221,12 @@ async function loadAll(showAlert = false) {
   } catch (e) {
     console.error(e);
     if (productsLoadStatus) {
-      productsLoadStatus.textContent = "Erreur : lance via Live Server / http (pas en fichier local).";
+      productsLoadStatus.textContent = "Erreur: vérifie que l'app est servie en https (GitHub Pages) et que les JSON existent.";
     }
   }
 }
 
-// ---------------- Render Products ----------------
+// ---------------- Render Products (code conservé) ----------------
 function renderProducts() {
   const countEl = document.getElementById("productsCount");
   if (countEl) countEl.textContent = `${products.length} produit(s)`;
@@ -257,7 +259,7 @@ function renderProducts() {
   }
 }
 
-// ---------------- Render Services ----------------
+// ---------------- Render Services (code conservé) ----------------
 function renderServices() {
   const tbody = document.querySelector("#servicesTable tbody");
   if (!tbody) return;
@@ -357,12 +359,16 @@ function renderDotations() {
   }
 }
 
-// ---------------- ENTRY (PACK si U/pack>0, sinon UNITÉS) ----------------
+// ---------------- ENTRY ----------------
 document.getElementById("clearEntry")?.addEventListener("click", () => {
   const sid = e_service?.value;
   if (!sid) return;
   entry[sid] = {};
+  prepared[sid] = {};
+  done[sid] = {};
   save(K_ENTRY, entry);
+  save(K_PREP, prepared);
+  save(K_DONE, done);
   renderEntry();
   renderPrep();
 });
@@ -437,6 +443,8 @@ function renderEntry() {
   tbody.querySelectorAll("input[data-u]").forEach(inp =>
     inp.addEventListener("input", () => updateEntryCell(sid, inp.getAttribute("data-u"), "u", inp.value))
   );
+
+  updateEntryReminderVisibility();
 }
 
 function updateEntryCell(sid, code, key, value) {
@@ -446,6 +454,7 @@ function updateEntryCell(sid, code, key, value) {
   const p = getProduct(code);
   const upp = p ? clampInt(p.unitsPerPack) : 0;
 
+  // règle: si pack>0 -> on n'autorise que packs ; sinon que unités
   if (upp > 0) {
     if (key === "u") return;
     entry[sid][code].u = "";
@@ -458,6 +467,7 @@ function updateEntryCell(sid, code, key, value) {
   entry[sid][code][key] = (v === "") ? "" : String(clampInt(v));
   save(K_ENTRY, entry);
 
+  // si tout vide -> on enlève aussi les données prépa/done pour ce produit
   const cur = entry[sid][code];
   const allEmpty =
     (cur.p === "" || cur.p == null) &&
@@ -476,7 +486,7 @@ function updateEntryCell(sid, code, key, value) {
   renderPrep();
 }
 
-// ---------------- PREP (TRI cartons -> packs -> petit) ----------------
+// ---------------- PREP ----------------
 document.getElementById("checkAll")?.addEventListener("click", () => {
   const sid = p_service?.value;
   if (!sid) return;
@@ -539,8 +549,9 @@ function renderPrep() {
   done[sid] = done[sid] || {};
   prepared[sid] = prepared[sid] || {};
 
-  // 1) construire la liste en respectant l'ordre dotations_order
   const raw = [];
+
+  // Construire RAW dans l'ordre dotations_order
   for (const code of codes) {
     const p = getProduct(code);
     if (!p) continue;
@@ -570,18 +581,10 @@ function renderPrep() {
     if (clampInt(p.unitsPerCarton) > 0) group = 0;
     else if (clampInt(p.unitsPerPack) > 0) group = 1;
 
-    raw.push({
-      code,
-      name: p.name,
-      needU,
-      paren,
-      isDone,
-      preparedU,
-      group
-    });
+    raw.push({ code, name: p.name, needU, paren, isDone, preparedU, group });
   }
 
-  // 2) TRI par groupe sans casser l'ordre interne (stable)
+  // TRI : cartons -> packs -> petit, sans casser l'ordre interne
   const lines = [
     ...raw.filter(x => x.group === 0),
     ...raw.filter(x => x.group === 1),
@@ -704,7 +707,174 @@ function renderPrep() {
     `${serviceName(sid)} • ${doneCount}/${lines.length} “fait” • Total à préparer: ${totalNeed} u • Total préparé: ${totalPrepared} u`;
 }
 
-// ---------------- Plein écran SAISIE (si bouton présent) ----------------
+// ---------------- Clôture / Consommation ----------------
+document.getElementById("closeSave")?.addEventListener("click", () => closeService(true));
+document.getElementById("closeNoSave")?.addEventListener("click", () => closeService(false));
+
+function closeService(withSave) {
+  const sid = p_service?.value || e_service?.value;
+  if (!sid) return;
+
+  // 1) sauver la consommation = ce que tu as réellement préparé (prepared[sid])
+  if (withSave) {
+    const items = prepared?.[sid] || {};
+    const ts = Date.now();
+
+    for (const [code, qty] of Object.entries(items)) {
+      const qtyU = clampInt(qty);
+      if (qtyU <= 0) continue;
+      logEvents.push({ ts, serviceId: sid, code: String(code), qtyU });
+    }
+    save(K_LOG, logEvents);
+  }
+
+  // 2) vider brouillon (saisie + fait + préparé)
+  entry[sid] = {};
+  done[sid] = {};
+  prepared[sid] = {};
+
+  save(K_ENTRY, entry);
+  save(K_DONE, done);
+  save(K_PREP, prepared);
+
+  renderEntry();
+  renderPrep();
+  renderConsumption();
+}
+
+// ---------------- Consommation (semaine/mois) ----------------
+const c_mode = document.getElementById("c_mode");
+const c_date = document.getElementById("c_date");
+const c_range = document.getElementById("c_range");
+
+c_mode?.addEventListener("change", renderConsumption);
+c_date?.addEventListener("change", renderConsumption);
+
+function toISODate(d){
+  const z = n => String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`;
+}
+function startOfWeek(d){
+  const x = new Date(d);
+  const day = (x.getDay()+6)%7; // lundi=0
+  x.setDate(x.getDate()-day);
+  x.setHours(0,0,0,0);
+  return x;
+}
+function endOfWeek(d){
+  const s = startOfWeek(d);
+  const e = new Date(s);
+  e.setDate(e.getDate()+7);
+  return e;
+}
+function startOfMonth(d){
+  const x = new Date(d.getFullYear(), d.getMonth(), 1);
+  x.setHours(0,0,0,0);
+  return x;
+}
+function endOfMonth(d){
+  const x = new Date(d.getFullYear(), d.getMonth()+1, 1);
+  x.setHours(0,0,0,0);
+  return x;
+}
+
+function renderConsumption(){
+  const mode = c_mode?.value || "week";
+  let base = c_date?.value ? new Date(c_date.value+"T00:00:00") : new Date();
+  if (c_date && !c_date.value) c_date.value = toISODate(base);
+
+  const from = (mode==="month") ? startOfMonth(base) : startOfWeek(base);
+  const to = (mode==="month") ? endOfMonth(base) : endOfWeek(base);
+
+  if (c_range) {
+    c_range.textContent = `Période : ${toISODate(from)} → ${toISODate(new Date(to.getTime()-1))}`;
+  }
+
+  const events = (logEvents || []).filter(ev => ev.ts >= from.getTime() && ev.ts < to.getTime());
+
+  const byProduct = {}; // code -> totalU
+  const byService = {}; // sid -> totalU
+
+  for (const ev of events) {
+    const code = String(ev.code);
+    const sid = String(ev.serviceId);
+    const qty = clampInt(ev.qtyU);
+
+    byProduct[code] = (byProduct[code]||0) + qty;
+    byService[sid] = (byService[sid]||0) + qty;
+  }
+
+  const tbP = document.querySelector("#c_table_products tbody");
+  if (tbP) {
+    tbP.innerHTML = "";
+    const rows = Object.entries(byProduct).sort((a,b)=>b[1]-a[1]);
+
+    if (!rows.length){
+      tbP.innerHTML = `<tr><td colspan="3" class="muted">Aucune consommation sur la période.</td></tr>`;
+    } else {
+      for (const [code,total] of rows) {
+        const p = getProduct(code);
+        tbP.innerHTML += `
+          <tr>
+            <td><strong>${escapeHtml(code)}</strong></td>
+            <td>${escapeHtml(p?.name || "")}</td>
+            <td><strong>${total}</strong></td>
+          </tr>`;
+      }
+    }
+  }
+
+  const tbS = document.querySelector("#c_table_services tbody");
+  if (tbS) {
+    tbS.innerHTML = "";
+    const rows = Object.entries(byService).sort((a,b)=>b[1]-a[1]);
+
+    if (!rows.length){
+      tbS.innerHTML = `<tr><td colspan="2" class="muted">Aucune consommation sur la période.</td></tr>`;
+    } else {
+      for (const [sid,total] of rows) {
+        tbS.innerHTML += `
+          <tr>
+            <td>${escapeHtml(serviceName(sid))}</td>
+            <td><strong>${total}</strong></td>
+          </tr>`;
+      }
+    }
+  }
+}
+
+document.getElementById("c_export")?.addEventListener("click", () => {
+  const rows = [["date","service","code","produit","qtyU"]];
+  for (const ev of (logEvents||[])) {
+    const d = new Date(ev.ts);
+    const date = toISODate(d);
+    const sid = ev.serviceId;
+    const code = ev.code;
+    const p = getProduct(code);
+    rows.push([date, serviceName(sid), code, p?.name || "", String(ev.qtyU)]);
+  }
+
+  const csv = rows.map(r => r.map(x => `"${String(x).replaceAll('"','""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "consommation.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("c_clear")?.addEventListener("click", () => {
+  if (!confirm("Effacer TOUT l'historique consommation ?")) return;
+  logEvents = [];
+  save(K_LOG, logEvents);
+  renderConsumption();
+});
+
+// ---------------- Plein écran SAISIE ----------------
 const fsBtn = document.getElementById("toggleFullscreenEntry");
 if (fsBtn) {
   fsBtn.addEventListener("click", () => {
