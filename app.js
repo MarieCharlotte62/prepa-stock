@@ -373,6 +373,7 @@ function renderDotations() {
 
 // ---------------- ENTRY ----------------
 document.getElementById("clearEntry")?.addEventListener("click", () => {
+  if (!confirm("Vider la saisie pour ce service ?")) return;
   const sid = e_service?.value;
   if (!sid) return;
   entry[sid] = {};
@@ -823,8 +824,14 @@ function updatePrepSummaryFromDom(sid) {
     `${serviceName(sid)} • ${doneCount}/${rows.length} "fait" • Total à préparer: ${totalNeed} u • Total préparé: ${totalPrepared} u`;
 }
 
-document.getElementById("closeSave")?.addEventListener("click", () => closeService(true));
-document.getElementById("closeNoSave")?.addEventListener("click", () => closeService(false));
+document.getElementById("closeSave")?.addEventListener("click", () => {
+  if (!confirm("Clôturer et sauvegarder la consommation pour ce service ?")) return;
+  closeService(true);
+});
+document.getElementById("closeNoSave")?.addEventListener("click", () => {
+  if (!confirm("Vider la saisie/prépa sans sauvegarder la consommation ?")) return;
+  closeService(false);
+});
 
 function closeService(withSave) {
   const sid = p_service?.value || e_service?.value;
