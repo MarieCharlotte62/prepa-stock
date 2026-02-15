@@ -120,6 +120,18 @@ function updateEntryReminderVisibility() {
   reminder.classList.toggle("hidden", !isVisible);
 }
 
+function focusNextNumberInput(currentEl, scope) {
+  const root = typeof scope === "string" ? document.querySelector(scope) : scope;
+  if (!root || !currentEl) return;
+  const inputs = Array.from(root.querySelectorAll('input[type="number"]:not([disabled])'));
+  const idx = inputs.indexOf(currentEl);
+  if (idx < 0) return;
+  const next = inputs[idx + 1];
+  if (!next) return;
+  next.focus();
+  if (typeof next.select === "function") next.select();
+}
+
 // ---------------- Tabs ----------------
 const tabButtons = document.querySelectorAll(".tab");
 const panels = {
@@ -437,12 +449,24 @@ function renderEntry() {
     tbody.appendChild(tr);
   }
 
-  tbody.querySelectorAll("input[data-p]").forEach(inp =>
-    inp.addEventListener("input", () => updateEntryCell(sid, inp.getAttribute("data-p"), "p", inp.value, inp))
-  );
-  tbody.querySelectorAll("input[data-u]").forEach(inp =>
-    inp.addEventListener("input", () => updateEntryCell(sid, inp.getAttribute("data-u"), "u", inp.value, inp))
-  );
+  tbody.querySelectorAll("input[data-p]").forEach(inp => {
+    inp.addEventListener("input", () => updateEntryCell(sid, inp.getAttribute("data-p"), "p", inp.value, inp));
+    inp.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        focusNextNumberInput(inp, "#entryTable");
+      }
+    });
+  });
+  tbody.querySelectorAll("input[data-u]").forEach(inp => {
+    inp.addEventListener("input", () => updateEntryCell(sid, inp.getAttribute("data-u"), "u", inp.value, inp));
+    inp.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        focusNextNumberInput(inp, "#entryTable");
+      }
+    });
+  });
 
   updateEntryReminderVisibility();
 }
@@ -705,6 +729,12 @@ function renderPrep() {
       }
 
       updatePrepSummaryFromDom(sid);
+    });
+    inp.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        focusNextNumberInput(inp, "#prepList");
+      }
     });
   });
 
