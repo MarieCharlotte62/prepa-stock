@@ -1,14 +1,12 @@
 // app.js (COMPLET)
-// ✅ Inputs "numériques" en TEXT (inputmode=numeric) pour éviter la validation/fermeture iPhone
-// ✅ Enter / "Suivant" => focus automatique sur le champ suivant (Saisie + Prépa)
-// ✅ Saisie: si U/pack>0 => saisie PACKS uniquement, sinon UNITÉS uniquement
-// ✅ Prépa: tri CARTONS -> PACKS -> PETIT PRODUIT (ordre interne conservé via dotations_order.json)
-// ✅ Consommation: clôture + sauvegarde écrit un log, affichage semaine/mois, export CSV
-// ✅ Onglets Produits/Services retirés de l'UI mais code conservé
+// - Prépa tri: CARTONS -> PACKS -> PETIT PRODUIT (ordre interne conservé via dotations_order.json)
+// - Saisie: si U/pack>0 => saisie PACKS uniquement, sinon UNITÉS uniquement
+// - Consommation: clôture + sauvegarde écrit un log, affichable semaine/mois, export CSV
+// - Onglets Produits/Services retirés de l'UI mais panels + code gardés
 
-const K_ENTRY = "ps_entry_json_v7";        // { serviceId: { code: { p:"", u:"" } } }
-const K_DONE  = "ps_done_json_v10";        // { serviceId: { code: true } }
-const K_PREP  = "ps_prepared_json_v10";    // { serviceId: { code: number } }
+const K_ENTRY = "ps_entry_json_v6";        // { serviceId: { code: { p:"", u:"" } } }
+const K_DONE  = "ps_done_json_v9";         // { serviceId: { code: true } }
+const K_PREP  = "ps_prepared_json_v9";     // { serviceId: { code: number } }
 const K_LOG   = "ps_consumption_log_v1";   // [ {ts, serviceId, code, qtyU} ]
 
 let products = [];
@@ -111,32 +109,6 @@ function getOrderedCodesForService(sid) {
   const ordered = order.filter(c => c in map);
   for (const c of codesInDot) if (!ordered.includes(c)) ordered.push(c);
   return ordered;
-}
-
-// ---- Input helpers (iPhone friendly) ----
-function numericTextValueToInt(v) {
-  const raw = String(v ?? "");
-  const digits = raw.replace(/[^\d]/g, "");
-  if (!digits) return "";
-  return String(clampInt(digits));
-}
-
-// Permet "Entrée" / "Suivant" => focus champ suivant
-function enableEnterToNext(container) {
-  if (!container) return;
-  const inputs = Array.from(container.querySelectorAll('input[data-p], input[data-u], input[data-prepared]'))
-    .filter(el => !el.disabled);
-
-  inputs.forEach((inp, idx) => {
-    inp.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const next = inputs[idx + 1];
-        if (next) next.focus();
-        else inp.blur();
-      }
-    });
-  });
 }
 
 // ---------------- Sticky reminder (SAISIE) ----------------
@@ -449,48 +421,33 @@ function renderEntry() {
       <td>${escapeHtml(code)}</td>
       <td>${escapeHtml(p.name)}</td>
       <td>
-        <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+        <input type="number" min="0" step="1"
           ${packEnabled ? "" : "disabled"}
           value="${escapeHtml(cur.p ?? "")}"
-          data-p="${escapeHtml(code)}">
+          data-p="${code}">
       </td>
       <td>
-        <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+        <input type="number" min="0" step="1"
           ${unitEnabled ? "" : "disabled"}
           value="${escapeHtml(cur.u ?? "")}"
-          data-u="${escapeHtml(code)}">
+          data-u="${code}">
       </td>
-      <td><strong>${prepU}</strong> <span class="muted">u</span></td>
+      <td><strong class="prepValue">${prepU}</strong> <span class="muted">u</span></td>
     `;
     tbody.appendChild(tr);
   }
 
-  // Input listeners (sanitize digits)
   tbody.querySelectorAll("input[data-p]").forEach(inp =>
-    inp.addEventListener("input", () => {
-      const code = inp.getAttribute("data-p");
-      const sanitized = numericTextValueToInt(inp.value);
-      if (inp.value !== sanitized) inp.value = sanitized;
-      updateEntryCell(sid, code, "p", sanitized);
-    })
+    inp.addEventListener("input", () => updateEntryCell(sid, inp.getAttribute("data-p"), "p", inp.value, inp))
   );
-
   tbody.querySelectorAll("input[data-u]").forEach(inp =>
-    inp.addEventListener("input", () => {
-      const code = inp.getAttribute("data-u");
-      const sanitized = numericTextValueToInt(inp.value);
-      if (inp.value !== sanitized) inp.value = sanitized;
-      updateEntryCell(sid, code, "u", sanitized);
-    })
+    inp.addEventListener("input", () => updateEntryCell(sid, inp.getAttribute("data-u"), "u", inp.value, inp))
   );
-
-  // Enter/Suivant => next input
-  enableEnterToNext(tbody);
 
   updateEntryReminderVisibility();
 }
 
-function updateEntryCell(sid, code, key, value) {
+function updateEntryCell(sid, code, key, value, inputEl) {
   entry[sid] = entry[sid] || {};
   entry[sid][code] = entry[sid][code] || { p:"", u:"" };
 
@@ -510,6 +467,7 @@ function updateEntryCell(sid, code, key, value) {
   entry[sid][code][key] = (v === "") ? "" : String(clampInt(v));
   save(K_ENTRY, entry);
 
+  // si tout vide -> on enlève aussi les données prépa/done pour ce produit
   const cur = entry[sid][code];
   const allEmpty =
     (cur.p === "" || cur.p == null) &&
@@ -524,8 +482,30 @@ function updateEntryCell(sid, code, key, value) {
     save(K_DONE, done);
   }
 
-  renderEntry();
-  renderPrep();
+  // Update only the current row to avoid re-rendering (keeps mobile keyboard open)
+  const row = inputEl?.closest("tr");
+  if (row) {
+    if (upp > 0 && key === "p") {
+      const unitInput = row.querySelector("input[data-u]");
+      if (unitInput) unitInput.value = "";
+    }
+    if (upp === 0 && key === "u") {
+      const packInput = row.querySelector("input[data-p]");
+      if (packInput) packInput.value = "";
+    }
+
+    const target = clampInt(dotations?.[sid]?.[code] ?? 0);
+    const cur = entry[sid][code] || { p:"", u:"" };
+    const allEmptyNow =
+      (cur.p === "" || cur.p == null) &&
+      (cur.u === "" || cur.u == null);
+    const prepU = (!p || allEmptyNow)
+      ? 0
+      : Math.max(0, target - unitsFromRestPackUnit(p, cur.p || 0, cur.u || 0));
+
+    const prepValueEl = row.querySelector(".prepValue");
+    if (prepValueEl) prepValueEl.textContent = String(prepU);
+  }
 }
 
 // ---------------- PREP ----------------
@@ -593,6 +573,7 @@ function renderPrep() {
 
   const raw = [];
 
+  // Construire RAW dans l'ordre dotations_order
   for (const code of codes) {
     const p = getProduct(code);
     if (!p) continue;
@@ -617,13 +598,15 @@ function renderPrep() {
     const isDone = !!done?.[sid]?.[code];
     const paren = formatParenCartonPack(p, needU);
 
-    let group = 2; // 0 cartons, 1 packs, 2 petit
+    // group: 0 cartons, 1 packs, 2 petit produit
+    let group = 2;
     if (clampInt(p.unitsPerCarton) > 0) group = 0;
     else if (clampInt(p.unitsPerPack) > 0) group = 1;
 
     raw.push({ code, name: p.name, needU, paren, isDone, preparedU, group });
   }
 
+  // TRI : cartons -> packs -> petit, sans casser l'ordre interne
   const lines = [
     ...raw.filter(x => x.group === 0),
     ...raw.filter(x => x.group === 1),
@@ -645,6 +628,8 @@ function renderPrep() {
 
     const row = document.createElement("div");
     row.className = "prepRow" + (filled ? " filled" : "") + (l.isDone ? " done" : "");
+    row.dataset.code = l.code;
+    row.dataset.need = String(l.needU);
     row.innerHTML = `
       <div class="prodCell" title="${escapeHtml(l.name)}">
         <span class="codeBadge">${escapeHtml(l.code)}</span>
@@ -658,7 +643,7 @@ function renderPrep() {
 
       <div class="prepCell right">
         <input class="prepInput"
-          type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+          type="number" min="0" step="1"
           value="${escapeHtml(preparedDisplay)}"
           data-prepared="${escapeHtml(l.code)}"
         />
@@ -671,14 +656,11 @@ function renderPrep() {
     list.appendChild(row);
   }
 
-  // Input "préparé" (sanitize digits)
+  // Input "préparé"
   list.querySelectorAll("input[data-prepared]").forEach(inp => {
     inp.addEventListener("input", () => {
       const code = inp.getAttribute("data-prepared");
-      const sanitized = numericTextValueToInt(inp.value);
-      if (inp.value !== sanitized) inp.value = sanitized;
-
-      const v = String(sanitized ?? "").trim();
+      const v = String(inp.value ?? "").trim();
 
       prepared[sid] = prepared[sid] || {};
       done[sid] = done[sid] || {};
@@ -702,7 +684,27 @@ function renderPrep() {
 
       save(K_PREP, prepared);
       save(K_DONE, done);
-      renderPrep();
+
+      const row = inp.closest(".prepRow");
+      if (row) {
+        row.dataset.need = String(needU);
+        const chk = row.querySelector("input[data-done]");
+        const isDone = !!done?.[sid]?.[code];
+        if (chk) chk.checked = isDone;
+
+        const preparedVal = clampInt(prepared?.[sid]?.[code] ?? 0);
+        const filled = (preparedVal > 0) || isDone;
+        row.classList.toggle("done", isDone);
+        row.classList.toggle("filled", filled);
+      }
+
+      if (v !== "") {
+        const val = clampInt(v);
+        const capped = Math.min(val, needU);
+        if (String(capped) !== String(v)) inp.value = String(capped);
+      }
+
+      updatePrepSummaryFromDom(sid);
     });
   });
 
@@ -729,12 +731,22 @@ function renderPrep() {
 
       save(K_DONE, done);
       save(K_PREP, prepared);
-      renderPrep();
+      const row = chk.closest(".prepRow");
+      if (row) {
+        row.dataset.need = String(needU);
+        const inp = row.querySelector("input[data-prepared]");
+        const preparedVal = clampInt(prepared?.[sid]?.[code] ?? 0);
+        if (inp) inp.value = preparedVal ? String(preparedVal) : "";
+
+        const isDone = !!done?.[sid]?.[code];
+        const filled = (preparedVal > 0) || isDone;
+        row.classList.toggle("done", isDone);
+        row.classList.toggle("filled", filled);
+      }
+
+      updatePrepSummaryFromDom(sid);
     });
   });
-
-  // Enter/Suivant => next input
-  enableEnterToNext(list);
 
   // Summary
   let doneCount = 0;
@@ -753,6 +765,34 @@ function renderPrep() {
 }
 
 // ---------------- Clôture / Consommation ----------------
+function updatePrepSummaryFromDom(sid) {
+  const list = document.getElementById("prepList");
+  const summary = document.getElementById("prepSummary");
+  if (!list || !summary) return;
+
+  const rows = list.querySelectorAll(".prepRow");
+  if (!rows.length) {
+    summary.textContent = `${serviceName(sid)}`;
+    return;
+  }
+
+  let doneCount = 0;
+  let totalNeed = 0;
+  let totalPrepared = 0;
+
+  rows.forEach(row => {
+    const code = row.dataset.code;
+    const needU = clampInt(row.dataset.need);
+    totalNeed += needU;
+    const pu = clampInt(prepared?.[sid]?.[code] ?? 0);
+    totalPrepared += Math.min(pu, needU);
+    if (!!done?.[sid]?.[code]) doneCount++;
+  });
+
+  summary.textContent =
+    `${serviceName(sid)} • ${doneCount}/${rows.length} "fait" • Total à préparer: ${totalNeed} u • Total préparé: ${totalPrepared} u`;
+}
+
 document.getElementById("closeSave")?.addEventListener("click", () => closeService(true));
 document.getElementById("closeNoSave")?.addEventListener("click", () => closeService(false));
 
@@ -760,6 +800,7 @@ function closeService(withSave) {
   const sid = p_service?.value || e_service?.value;
   if (!sid) return;
 
+  // 1) sauver la consommation = ce que tu as réellement préparé (prepared[sid])
   if (withSave) {
     const items = prepared?.[sid] || {};
     const ts = Date.now();
@@ -772,6 +813,7 @@ function closeService(withSave) {
     save(K_LOG, logEvents);
   }
 
+  // 2) vider brouillon (saisie + fait + préparé)
   entry[sid] = {};
   done[sid] = {};
   prepared[sid] = {};
@@ -785,7 +827,7 @@ function closeService(withSave) {
   renderConsumption();
 }
 
-// ---------------- Consommation ----------------
+// ---------------- Consommation (semaine/mois) ----------------
 const c_mode = document.getElementById("c_mode");
 const c_date = document.getElementById("c_date");
 const c_range = document.getElementById("c_range");
@@ -799,7 +841,7 @@ function toISODate(d){
 }
 function startOfWeek(d){
   const x = new Date(d);
-  const day = (x.getDay()+6)%7;
+  const day = (x.getDay()+6)%7; // lundi=0
   x.setDate(x.getDate()-day);
   x.setHours(0,0,0,0);
   return x;
@@ -835,8 +877,8 @@ function renderConsumption(){
 
   const events = (logEvents || []).filter(ev => ev.ts >= from.getTime() && ev.ts < to.getTime());
 
-  const byProduct = {};
-  const byService = {};
+  const byProduct = {}; // code -> totalU
+  const byService = {}; // sid -> totalU
 
   for (const ev of events) {
     const code = String(ev.code);
