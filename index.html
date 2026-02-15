@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prépa Services</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">📦</div>
+      <div>
+        <div class="title">Prépa Services</div>
+        <div class="subtitle">Base JSON → dotations → reste → prépa</div>
+      </div>
+    </div>
+
+    <nav class="tabs" aria-label="Navigation">
+      <button class="tab active" data-tab="products">Produits</button>
+      <button class="tab" data-tab="services">Services</button>
+      <button class="tab" data-tab="dotations">Dotations</button>
+      <button class="tab" data-tab="entry">Saisie</button>
+      <button class="tab" data-tab="prep">Prépa</button>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <!-- PRODUITS -->
+    <section class="panel" id="tab-products">
+      <h2>Base produits (products.json)</h2>
+
+      <div class="card">
+        <div class="row space">
+          <div>
+            <strong>Chargement</strong>
+            <div class="muted" id="productsLoadStatus">…</div>
+          </div>
+          <div class="row">
+            <button class="btn ghost" type="button" id="reloadAll">Recharger</button>
+          </div>
+        </div>
+
+        <div class="muted footnote">
+          Modifie <strong>products.json / services.json / dotations.json / dotations_order.json</strong> puis recharge.
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="row space">
+          <h3>Liste produits</h3>
+          <div class="muted" id="productsCount"></div>
+        </div>
+
+        <div class="tableWrap">
+          <table class="table" id="productsTable">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Nom</th>
+                <th>Catégorie</th>
+                <th>U/carton</th>
+                <th>U/pack</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="panel hidden" id="tab-services">
+      <h2>Services (services.json)</h2>
+
+      <div class="card">
+        <div class="tableWrap">
+          <table class="table" id="servicesTable">
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Produits (dotation)</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="muted footnote">
+          Les services sont chargés depuis <strong>services.json</strong>.
+        </div>
+      </div>
+    </section>
+
+    <!-- DOTATIONS -->
+    <section class="panel hidden" id="tab-dotations">
+      <h2>Dotations (dotations.json + dotations_order.json)</h2>
+
+      <div class="card">
+        <div class="row space">
+          <label class="inline">
+            Service
+            <select id="d_service"></select>
+          </label>
+          <div class="muted">Affichage dans l’ordre d’emplacement.</div>
+        </div>
+
+        <div class="tableWrap">
+          <table class="table" id="dotationsTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Code</th>
+                <th>Produit</th>
+                <th>Cible (unités)</th>
+                <th>Équivalent</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAISIE (PACK + UNITE) -->
+    <section class="panel hidden" id="tab-entry">
+      <h2>Saisie (reste dans le service)</h2>
+
+      <button id="toggleFullscreenEntry" class="btn ghost">🔍 Plein écran</button>
+
+      <div class="card">
+        <div class="row space">
+          <label class="inline">
+            Service
+            <select id="e_service"></select>
+          </label>
+
+          <div class="row">
+            <button class="btn ghost" type="button" id="clearEntry">Vider saisie</button>
+          </div>
+        </div>
+
+        <div class="muted footnote">
+          Règle : <strong>vide = rien à préparer</strong> • <strong>0 = plus rien</strong>
+        </div>
+
+        <div class="tableWrap">
+          <table class="table" id="entryTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Code</th>
+                <th>Produit</th>
+                <th>Packs restants</th>
+                <th>Unités restantes</th>
+                <th>À préparer</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+     <!-- AJOUTE ÇA DANS index.html, DANS LA SECTION SAISIE (tab-entry), TOUT EN BAS AVANT </section> -->
+     <div id="entryReminder" class="stickyReminder hidden">
+        🧾 Pense à prendre les feuilles <strong>Épicerie</strong> + <strong>Diététiques</strong>
+     </div>
+
+    </section>
+
+    <!-- PREPA -->
+    <section class="panel hidden" id="tab-prep">
+      <h2>Préparation à faire</h2>
+
+      <div class="card">
+        <div class="row space">
+          <label class="inline">
+            Service
+            <select id="p_service"></select>
+          </label>
+
+          <div class="row">
+            <button class="btn ghost" type="button" id="uncheckAll">Tout décocher</button>
+            <button class="btn" type="button" id="checkAll">Tout cocher</button>
+          </div>
+        </div>
+
+        <div class="muted footnote">
+          1 produit = 1 ligne. Code + quantité bien visibles. (Astuce: laisse ton doigt sur “À préparer” pour voir l’équivalent)
+        </div>
+
+        <div class="prepHeader">
+          <div>Produit</div>
+          <div class="right">À préparer</div>
+          <div class="right">Préparé</div>
+          <div class="center">Fait</div>
+        </div>
+
+        <div id="prepList" class="prepList"></div>
+        <div class="muted footnote" id="prepSummary"></div>
+        <div class="muted footnote">Ordre = <strong>dotations_order.json</strong>.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+[
+  { "id": "SSMC_2E_1700", "name": "2E SSMC (1700)" },
+  { "id": "SSR_3E_1750", "name": "3E SSR (1750)" },
+  { "id": "MPRN_4E_1800", "name": "4e MPRN (1800)" },
+  { "id": "EPICERIE_RESTAURANT", "name": "EPICERIE RESTAURANT" },
+  { "id": "EPICERIE_CHENES", "name": "EPICERIE CHÊNES" },
+  { "id": "RESERVE_CHENES", "name": "RESERVE CHÊNES" },
+  { "id": "RESERVE_PRUNIERS", "name": "RESERVE PRUNIERS" },
+  { "id": "RESERVE_CERISIERS", "name": "RESERVE CERISIERS" },
+  { "id": "EPICERIE_PRUNIERS", "name": "EPICERIE PRUNIERS" },
+  { "id": "EPICERIE_MAGNOLIAS", "name": "EPICERIE MAGNOLIAS" },
+  { "id": "RESERVE_MAGNOLIAS", "name": "RESERVCE MAGNOLIAS" }
+]
