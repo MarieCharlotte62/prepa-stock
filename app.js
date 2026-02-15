@@ -1,12 +1,14 @@
 // app.js (COMPLET)
-// - Prépa tri: CARTONS -> PACKS -> PETIT PRODUIT (ordre interne conservé via dotations_order.json)
-// - Saisie: si U/pack>0 => saisie PACKS uniquement, sinon UNITÉS uniquement
-// - Consommation: clôture + sauvegarde écrit un log, affichable semaine/mois, export CSV
-// - Onglets Produits/Services retirés de l'UI mais panels + code gardés
+// ✅ Inputs "numériques" en TEXT (inputmode=numeric) pour éviter la validation/fermeture iPhone
+// ✅ Enter / "Suivant" => focus automatique sur le champ suivant (Saisie + Prépa)
+// ✅ Saisie: si U/pack>0 => saisie PACKS uniquement, sinon UNITÉS uniquement
+// ✅ Prépa: tri CARTONS -> PACKS -> PETIT PRODUIT (ordre interne conservé via dotations_order.json)
+// ✅ Consommation: clôture + sauvegarde écrit un log, affichage semaine/mois, export CSV
+// ✅ Onglets Produits/Services retirés de l'UI mais code conservé
 
-const K_ENTRY = "ps_entry_json_v6";        // { serviceId: { code: { p:"", u:"" } } }
-const K_DONE  = "ps_done_json_v9";         // { serviceId: { code: true } }
-const K_PREP  = "ps_prepared_json_v9";     // { serviceId: { code: number } }
+const K_ENTRY = "ps_entry_json_v7";        // { serviceId: { code: { p:"", u:"" } } }
+const K_DONE  = "ps_done_json_v10";        // { serviceId: { code: true } }
+const K_PREP  = "ps_prepared_json_v10";    // { serviceId: { code: number } }
 const K_LOG   = "ps_consumption_log_v1";   // [ {ts, serviceId, code, qtyU} ]
 
 let products = [];
@@ -109,6 +111,32 @@ function getOrderedCodesForService(sid) {
   const ordered = order.filter(c => c in map);
   for (const c of codesInDot) if (!ordered.includes(c)) ordered.push(c);
   return ordered;
+}
+
+// ---- Input helpers (iPhone friendly) ----
+function numericTextValueToInt(v) {
+  const raw = String(v ?? "");
+  const digits = raw.replace(/[^\d]/g, "");
+  if (!digits) return "";
+  return String(clampInt(digits));
+}
+
+// Permet "Entrée" / "Suivant" => focus champ suivant
+function enableEnterToNext(container) {
+  if (!container) return;
+  const inputs = Array.from(container.querySelectorAll('input[data-p], input[data-u], input[data-prepared]'))
+    .filter(el => !el.disabled);
+
+  inputs.forEach((inp, idx) => {
+    inp.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const next = inputs[idx + 1];
+        if (next) next.focus();
+        else inp.blur();
+      }
+    });
+  });
 }
 
 // ---------------- Sticky reminder (SAISIE) ----------------
@@ -421,28 +449,43 @@ function renderEntry() {
       <td>${escapeHtml(code)}</td>
       <td>${escapeHtml(p.name)}</td>
       <td>
-        <input type="number" min="0" step="1"
+        <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
           ${packEnabled ? "" : "disabled"}
           value="${escapeHtml(cur.p ?? "")}"
-          data-p="${code}">
+          data-p="${escapeHtml(code)}">
       </td>
       <td>
-        <input type="number" min="0" step="1"
+        <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
           ${unitEnabled ? "" : "disabled"}
           value="${escapeHtml(cur.u ?? "")}"
-          data-u="${code}">
+          data-u="${escapeHtml(code)}">
       </td>
       <td><strong>${prepU}</strong> <span class="muted">u</span></td>
     `;
     tbody.appendChild(tr);
   }
 
+  // Input listeners (sanitize digits)
   tbody.querySelectorAll("input[data-p]").forEach(inp =>
-    inp.addEventListener("input", () => updateEntryCell(sid, inp.getAttribute("data-p"), "p", inp.value))
+    inp.addEventListener("input", () => {
+      const code = inp.getAttribute("data-p");
+      const sanitized = numericTextValueToInt(inp.value);
+      if (inp.value !== sanitized) inp.value = sanitized;
+      updateEntryCell(sid, code, "p", sanitized);
+    })
   );
+
   tbody.querySelectorAll("input[data-u]").forEach(inp =>
-    inp.addEventListener("input", () => updateEntryCell(sid, inp.getAttribute("data-u"), "u", inp.value))
+    inp.addEventListener("input", () => {
+      const code = inp.getAttribute("data-u");
+      const sanitized = numericTextValueToInt(inp.value);
+      if (inp.value !== sanitized) inp.value = sanitized;
+      updateEntryCell(sid, code, "u", sanitized);
+    })
   );
+
+  // Enter/Suivant => next input
+  enableEnterToNext(tbody);
 
   updateEntryReminderVisibility();
 }
@@ -467,7 +510,6 @@ function updateEntryCell(sid, code, key, value) {
   entry[sid][code][key] = (v === "") ? "" : String(clampInt(v));
   save(K_ENTRY, entry);
 
-  // si tout vide -> on enlève aussi les données prépa/done pour ce produit
   const cur = entry[sid][code];
   const allEmpty =
     (cur.p === "" || cur.p == null) &&
@@ -551,7 +593,6 @@ function renderPrep() {
 
   const raw = [];
 
-  // Construire RAW dans l'ordre dotations_order
   for (const code of codes) {
     const p = getProduct(code);
     if (!p) continue;
@@ -576,15 +617,13 @@ function renderPrep() {
     const isDone = !!done?.[sid]?.[code];
     const paren = formatParenCartonPack(p, needU);
 
-    // group: 0 cartons, 1 packs, 2 petit produit
-    let group = 2;
+    let group = 2; // 0 cartons, 1 packs, 2 petit
     if (clampInt(p.unitsPerCarton) > 0) group = 0;
     else if (clampInt(p.unitsPerPack) > 0) group = 1;
 
     raw.push({ code, name: p.name, needU, paren, isDone, preparedU, group });
   }
 
-  // TRI : cartons -> packs -> petit, sans casser l'ordre interne
   const lines = [
     ...raw.filter(x => x.group === 0),
     ...raw.filter(x => x.group === 1),
@@ -619,7 +658,7 @@ function renderPrep() {
 
       <div class="prepCell right">
         <input class="prepInput"
-          type="number" min="0" step="1"
+          type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
           value="${escapeHtml(preparedDisplay)}"
           data-prepared="${escapeHtml(l.code)}"
         />
@@ -632,11 +671,14 @@ function renderPrep() {
     list.appendChild(row);
   }
 
-  // Input "préparé"
+  // Input "préparé" (sanitize digits)
   list.querySelectorAll("input[data-prepared]").forEach(inp => {
     inp.addEventListener("input", () => {
       const code = inp.getAttribute("data-prepared");
-      const v = String(inp.value ?? "").trim();
+      const sanitized = numericTextValueToInt(inp.value);
+      if (inp.value !== sanitized) inp.value = sanitized;
+
+      const v = String(sanitized ?? "").trim();
 
       prepared[sid] = prepared[sid] || {};
       done[sid] = done[sid] || {};
@@ -691,6 +733,9 @@ function renderPrep() {
     });
   });
 
+  // Enter/Suivant => next input
+  enableEnterToNext(list);
+
   // Summary
   let doneCount = 0;
   let totalNeed = 0;
@@ -715,7 +760,6 @@ function closeService(withSave) {
   const sid = p_service?.value || e_service?.value;
   if (!sid) return;
 
-  // 1) sauver la consommation = ce que tu as réellement préparé (prepared[sid])
   if (withSave) {
     const items = prepared?.[sid] || {};
     const ts = Date.now();
@@ -728,7 +772,6 @@ function closeService(withSave) {
     save(K_LOG, logEvents);
   }
 
-  // 2) vider brouillon (saisie + fait + préparé)
   entry[sid] = {};
   done[sid] = {};
   prepared[sid] = {};
@@ -742,7 +785,7 @@ function closeService(withSave) {
   renderConsumption();
 }
 
-// ---------------- Consommation (semaine/mois) ----------------
+// ---------------- Consommation ----------------
 const c_mode = document.getElementById("c_mode");
 const c_date = document.getElementById("c_date");
 const c_range = document.getElementById("c_range");
@@ -756,7 +799,7 @@ function toISODate(d){
 }
 function startOfWeek(d){
   const x = new Date(d);
-  const day = (x.getDay()+6)%7; // lundi=0
+  const day = (x.getDay()+6)%7;
   x.setDate(x.getDate()-day);
   x.setHours(0,0,0,0);
   return x;
@@ -792,8 +835,8 @@ function renderConsumption(){
 
   const events = (logEvents || []).filter(ev => ev.ts >= from.getTime() && ev.ts < to.getTime());
 
-  const byProduct = {}; // code -> totalU
-  const byService = {}; // sid -> totalU
+  const byProduct = {};
+  const byService = {};
 
   for (const ev of events) {
     const code = String(ev.code);
