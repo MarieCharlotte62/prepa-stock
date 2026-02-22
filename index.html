@@ -3,7 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Prépa Stock</title>
+  <title>Magasin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -12,8 +15,8 @@
     <div class="brand">
       <div class="logo">📦</div>
       <div>
-        <div class="title">Prépa Stock</div>
-        <div class="subtitle">Saisie → Prépa → Consommation</div>
+        <div class="title">Magasin</div>
+        <div class="subtitle"></div>
       </div>
     </div>
 
@@ -22,18 +25,142 @@
       <!-- <button class="tab" data-tab="products">Produits</button> -->
       <!-- <button class="tab" data-tab="services">Services</button> -->
 
-      <button class="tab active" data-tab="dotations">Dotations</button>
-      <button class="tab" data-tab="entry">Saisie</button>
-      <button class="tab" data-tab="prep">Prépa</button>
+      <button class="tab active" data-tab="planning">Planning</button>
+      <button class="tab" data-tab="epi">EPI</button>
+      <button class="tab" data-tab="order">Commande</button>
+      <button class="tab" data-tab="dotations">Dotations</button>
+      <button class="tab" data-tab="entry">Complément</button>
+      <button class="tab" data-tab="prep">Prépar.</button>
       <button class="tab" data-tab="consumption">Consommation</button>
 
-      <button class="btn ghost" id="reloadAll" style="margin-left:auto;">↻ Recharger JSON</button>
+      <div class="menuWrap">
+        <button class="menuToggle" id="moreMenuToggle" aria-haspopup="true" aria-expanded="false">...</button>
+        <div class="menu" id="moreMenu">
+          <button class="menuItem" data-tab="epi">EPI</button>
+          <button class="menuItem" data-tab="order">Commande</button>
+          <button class="menuItem" data-tab="dotations">Dotations</button>
+          <button class="menuItem" data-tab="consumption">Consommation</button>
+        </div>
+      </div>
     </div>
 
-    <div class="muted" style="margin-top:8px" id="productsLoadStatus"></div>
+    <div class="statusBar muted" id="productsLoadStatus"></div>
   </header>
 
   <!-- ========== PANELS ========== -->
+  <!-- Planning -->
+  <section id="tab-planning" class="panel">
+    <div class="container">
+      <div class="card">
+        <div class="row space">
+          <div>
+            <div class="title">Planning</div>
+            <div class="subtitle muted">Tâches hebdomadaires par service</div>
+          </div>
+        </div>
+
+        <div class="subtabs">
+          <button class="subtab active" data-plan="hospital">Hôpital</button>
+          <button class="subtab" data-plan="ehpad">EHPAD</button>
+          <button class="btn ghost planningClear" id="planningClear">Tout décocher</button>
+        </div>
+
+        <div id="planningContent" class="planningContent"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EPI -->
+  <section id="tab-epi" class="panel hidden">
+    <div class="container">
+      <div class="card">
+        <div class="row space">
+          <div>
+            <div class="title">EPI</div>
+            <div class="subtitle muted">Suivi des stocks</div>
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table class="table" id="epiTable">
+            <colgroup>
+              <col />
+              <col style="width:130px" />
+              <col style="width:130px" />
+              <col style="width:110px" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Désignation</th>
+                <th>Stock EHPAD</th>
+                <th>Stock Hôpital</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Commande -->
+  <section id="tab-order" class="panel hidden">
+    <div class="container">
+      <div class="card">
+        <div class="row space">
+          <div>
+            <div class="title">Commande</div>
+            <div class="subtitle muted">Seuils + sélection à commander</div>
+          </div>
+        </div>
+
+        <div class="subtabs orderSubtabs">
+          <button class="subtab active" data-order="hospital">Hôpital</button>
+          <button class="subtab" data-order="ehpad">EHPAD</button>
+        </div>
+
+        <div class="tableWrap orderTableWrap">
+          <table class="table" id="orderTable">
+            <colgroup>
+              <col style="width:72px" />
+              <col />
+              <col style="width:76px" />
+              <col style="width:64px" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Produit</th>
+                <th>Qté</th>
+                <th>À cmd</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="row space" style="margin-top:14px">
+          <div class="title" style="font-size:14px">Produits à commander</div>
+        </div>
+        <div class="tableWrap">
+          <table class="table" id="orderListTable">
+            <colgroup>
+              <col style="width:90px" />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Produit</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- (Cachés) Produits / Services : conservés dans le code -->
   <section id="tab-products" class="panel hidden">
@@ -47,6 +174,13 @@
         </div>
         <div class="tableWrap">
           <table class="table" id="productsTable">
+            <colgroup>
+              <col style="width:110px" />
+              <col />
+              <col style="width:140px" />
+              <col style="width:90px" />
+              <col style="width:90px" />
+            </colgroup>
             <thead>
               <tr>
                 <th>Code</th><th>Nom</th><th>Catégorie</th><th>U/carton</th><th>U/pack</th>
@@ -65,6 +199,10 @@
         <div class="title">Services</div>
         <div class="tableWrap">
           <table class="table" id="servicesTable">
+            <colgroup>
+              <col />
+              <col style="width:120px" />
+            </colgroup>
             <thead>
               <tr><th>Service</th><th>Nb produits</th></tr>
             </thead>
@@ -76,7 +214,7 @@
   </section>
 
   <!-- Dotations -->
-  <section id="tab-dotations" class="panel">
+  <section id="tab-dotations" class="panel hidden">
     <div class="container">
       <div class="card">
         <div class="row space">
@@ -92,7 +230,7 @@
         <div class="tableWrap">
           <table class="table" id="dotationsTable">
             <thead>
-              <tr><th>#</th><th>Code</th><th>Produit</th><th>Dotation (u)</th><th class="muted">Équiv.</th></tr>
+              <tr><th>#</th><th>Code</th><th>Produit</th><th>Qté</th><th class="muted">Unt</th></tr>
             </thead>
             <tbody></tbody>
           </table>
@@ -111,7 +249,7 @@
       <div class="card">
         <div class="row space">
           <div>
-            <div class="title">Saisie</div>
+            <div class="title">Complément</div>
             <div class="subtitle muted">Tu saisis uniquement Pack si U/pack > 0, sinon Unités</div>
           </div>
           <div class="inline">
@@ -130,7 +268,7 @@
                 <th>Produit</th>
                 <th>Packs</th>
                 <th>Unités</th>
-                <th>À préparer</th>
+                <th>Qté</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -144,13 +282,13 @@
     </div>
   </section>
 
-  <!-- Prépa -->
+  <!-- Prépar. -->
   <section id="tab-prep" class="panel hidden">
     <div class="container">
       <div class="card">
         <div class="row space">
           <div>
-            <div class="title">Prépa</div>
+            <div class="title">Prépar.</div>
             <div class="subtitle muted" id="prepSummary"></div>
           </div>
 
@@ -166,13 +304,15 @@
           <button class="btn ghost" id="closeNoSave">🧹 Vider sans sauvegarder</button>
         </div>
 
-        <div class="prepHeader">
-          <div>Produit</div>
-          <div class="right">À préparer</div>
-          <div class="right">Préparé</div>
-          <div class="center">Fait</div>
+        <div class="tableWrap prepWrap">
+          <div class="prepHeader">
+            <div>Produit</div>
+            <div class="right">À préparer</div>
+            <div class="right">Préparé</div>
+            <div class="center">Fait</div>
+          </div>
+          <div id="prepList" class="prepList"></div>
         </div>
-        <div id="prepList" class="prepList"></div>
 
         <div class="footnote muted">
           Clôturer + sauvegarder = enregistre la consommation (historique) puis remet à zéro saisie/prépa pour le service.
@@ -206,6 +346,11 @@
 
         <div class="tableWrap">
           <table class="table" id="c_table_products">
+            <colgroup>
+              <col style="width:100px" />
+              <col />
+              <col style="width:110px" />
+            </colgroup>
             <thead>
               <tr><th>Code</th><th>Produit</th><th>Total (u)</th></tr>
             </thead>
@@ -215,6 +360,10 @@
 
         <div class="tableWrap">
           <table class="table" id="c_table_services">
+            <colgroup>
+              <col />
+              <col style="width:110px" />
+            </colgroup>
             <thead>
               <tr><th>Service</th><th>Total (u)</th></tr>
             </thead>
@@ -228,7 +377,7 @@
 
   <!-- Bandeau rappel SAISIE -->
   <div id="entryReminder" class="stickyReminder hidden">
-    <strong>Rappel :</strong> prendre les feuilles épicerie / diététiques 🧾
+    <strong>Rappel :</strong> prévoir les feuilles épicerie et diététiques.
   </div>
 
   <script src="app.js"></script>
