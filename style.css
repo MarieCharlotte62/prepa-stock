@@ -314,6 +314,14 @@ body{
 .space{justify-content:space-between}
 .muted{color:var(--muted)}
 .footnote{margin-top:10px;font-size:12px;color:var(--muted)}
+.backTopWrap{
+  margin-top:12px;
+  display:flex;
+  justify-content:flex-end;
+}
+.backTopBtn{
+  min-width:130px;
+}
 
 .btn{
   border:1px solid #d58383;

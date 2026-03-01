@@ -1017,6 +1017,13 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeMoreMenu();
 });
 
+// ---------------- Flèche retour haut (Complément / Prépar.) ----------------
+document.querySelectorAll("[data-back-top]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
+
 // ---------------- Load JSONs ----------------
 const productsLoadStatus = document.getElementById("productsLoadStatus");
 document.getElementById("reloadAll")?.addEventListener("click", () => loadAll(true));
