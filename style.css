@@ -1,12 +1,12 @@
 :root{
-  --bg:#f7f2f0;
-  --bg-2:#f1e7e3;
-  --ink:#2f2a28;
-  --muted:#6f5f59;
+  --bg:#f7f8f5;
+  --bg-2:#eef2ed;
+  --ink:#243b35;
+  --muted:#65716c;
   --card:#ffffff;
-  --line:#e8dcd6;
-  --accent:#d98c8c;
-  --accent-2:#9bb7a4;
+  --line:#e1e7df;
+  --accent:#426a58;
+  --accent-2:#94ad9a;
   --shadow:0 10px 30px rgba(58,35,27,.08);
 }
 
@@ -21,7 +21,7 @@ body{
   -moz-osx-font-smoothing: grayscale;
   background:
     radial-gradient(1200px 600px at 15% -10%, #f8e6df 0, transparent 55%),
-    radial-gradient(900px 600px at 100% 0%, #f3ece7 0, transparent 60%),
+    radial-gradient(900px 600px at 100% 0%, #eff1ed 0, transparent 60%),
     var(--bg);
 }
 
@@ -113,7 +113,7 @@ body{
   font-weight:600;
 }
 .menuItem:hover{
-  background:#fbf4f2;
+  background:#f3f6f1;
   border-color:var(--line);
 }
 
@@ -122,7 +122,7 @@ body{
   display:flex;
   gap:8px;
   margin-top:12px;
-  background:#faf6f4;
+  background:#f0f4ef;
   border:1px solid var(--line);
   padding:6px;
   border-radius:12px;
@@ -212,7 +212,7 @@ body{
   accent-color: var(--accent);
 }
 .orderCategory td{
-  background:#faf6f4;
+  background:#f0f4ef;
   color:var(--muted);
   font-weight:700;
   text-transform:uppercase;
@@ -220,8 +220,8 @@ body{
   font-size:11px;
 }
 .orderSubcategory td{
-  background:#fff8f6;
-  color:#8f7369;
+  background:#f7f8f4;
+  color:#596e5f;
   font-weight:700;
   font-size:11px;
   letter-spacing:.2px;
@@ -325,7 +325,7 @@ body{
 
 .btn{
   border:1px solid #d58383;
-  background:linear-gradient(180deg,#e6a3a3 0%, #d98c8c 100%);
+  background:linear-gradient(180deg,#e6a3a3 0%, #426a58 100%);
   color:#fff;
   border-radius:12px;
   padding:10px 12px;
@@ -395,14 +395,14 @@ input[type="date"]:focus{
   letter-spacing:.6px;
   text-transform:uppercase;
   color:var(--muted);
-  background:#faf6f4;
+  background:#f0f4ef;
   font-weight:700;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 .table tbody tr:hover{
-  background:#fbf4f2;
+  background:#f3f6f1;
 }
 .table tr:last-child td{border-bottom:0}
 
@@ -473,7 +473,7 @@ input[type="date"]:focus{
   font-size:12px;
   font-weight:700;
   color:var(--muted);
-  background:#faf6f4;
+  background:#f0f4ef;
   border:1px solid var(--line);
   border-radius:12px;
 }
@@ -612,133 +612,11 @@ input[type="date"]:focus{
 }
 
 #entryTable input[type="number"]:disabled{
-  background: #f3ece7 !important;
-  border-color: #eadfd9 !important;
-  color: #b1a39d !important;
+  background: #eff1ed !important;
+  border-color: #e1e7df !important;
+  color: #8e9890 !important;
   cursor: not-allowed;
   opacity: 1;
-}
-
-/* ===== Rappel SAISIE ===== */
-#tab-entry{
-  padding-bottom: 70px;
-}
-
-.stickyReminder{
-  position: fixed;
-  left: 14px;
-  right: 14px;
-  bottom: 14px;
-  z-index: 50;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  padding: 12px 14px;
-  border-radius: 14px;
-
-  background: #fff2f0;
-  border: 1px solid #f2c9c9;
-  box-shadow: 0 10px 30px rgba(90,50,40,.12);
-  backdrop-filter: blur(10px);
-
-  color: var(--ink);
-  font-weight: 800;
-  text-align: center;
-  animation: reminder-pulse 1.2s ease-in-out infinite;
-}
-
-#entryReminder{display:none}
-body.show-entry-reminder #entryReminder{display:flex}
-
-.stickyReminder::before{
-  content: "🧾";
-  font-size: 18px;
-  opacity: .95;
-}
-
-.stickyReminder strong{
-  color: var(--ink);
-  font-weight: 900;
-}
-
-.stickyReminder::after{
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 12px;
-  right: 12px;
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #e6a3a3, #d98c8c);
-  opacity: .9;
-}
-
-@keyframes reminder-pulse{
-  0%,100%{
-    background:#fff2f0;
-    border-color:#f2c9c9;
-    box-shadow:0 10px 30px rgba(90,50,40,.12);
-  }
-  50%{
-    background:#f6d6d6;
-    border-color:#d98c8c;
-    box-shadow:0 16px 36px rgba(90,50,40,.20);
-  }
-}
-
-@media (prefers-reduced-motion: reduce){
-  .stickyReminder{animation:none}
-}
-
-/* ===== Mode plein écran (Saisie) largeur totale ===== */
-body.fullscreen-entry{
-  overflow: hidden;
-}
-
-body.fullscreen-entry .topbar,
-body.fullscreen-entry .tabs{
-  display: none !important;
-}
-
-body.fullscreen-entry #tab-entry{
-  position: fixed;
-  inset: 0;
-  z-index: 999;
-  margin: 0;
-  padding: 4px;
-  background: var(--bg);
-  overflow: auto;
-}
-
-body.fullscreen-entry #tab-entry .container{
-  max-width: 100% !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-body.fullscreen-entry .tableWrap{
-  width: 100%;
-  overflow-x: visible;
-}
-
-body.fullscreen-entry .table{
-  width: 100%;
-}
-
-#toggleFullscreenEntry{
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  margin-bottom: 6px;
-}
-
-body.fullscreen-entry #toggleFullscreenEntry{
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
 }
 
 /* ===== Responsive mobile / iPhone ===== */
@@ -760,7 +638,6 @@ body.fullscreen-entry #toggleFullscreenEntry{
   }
   .tabs::-webkit-scrollbar{display:none}
   .tab[data-tab="dotations"],
-  .tab[data-tab="consumption"],
   .tab[data-tab="epi"],
   .tab[data-tab="order"]{
     display:none;
@@ -835,19 +712,6 @@ body.fullscreen-entry #toggleFullscreenEntry{
     text-overflow:clip;
     white-space:normal;
     vertical-align:bottom;
-  }
-
-  #tab-entry{padding-bottom:78px}
-  .stickyReminder{
-    left:10px;
-    right:10px;
-    bottom:10px;
-    padding:11px 12px;
-    font-size:13.5px;
-    border-radius:14px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
   }
 
   .prodCell{
@@ -953,3 +817,267 @@ body.fullscreen-entry #toggleFullscreenEntry{
   font-size:12px;
   color:var(--muted);
 }
+
+/* Gestion du catalogue et des dotations */
+.catalogNotice{background:#f1f6f2;border:1px solid #c5d5c9;padding:12px;border-radius:10px;color:#304839}
+.catalogBackup{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.importLabel{position:relative;cursor:pointer;display:inline-flex;align-items:center;overflow:hidden}
+.importLabel input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.importLabel:focus-within{outline:2px solid var(--ink);outline-offset:2px}
+.catalogEditor{margin:18px 0;padding:14px;border:1px solid var(--line);border-radius:12px;background:#f7f9f5}
+.catalogEditor summary{font-weight:700;cursor:pointer;min-height:32px}
+.catalogForm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0;align-items:end}
+.catalogForm label{display:flex;flex-direction:column;gap:6px;min-width:0;font-weight:600}
+.catalogForm input,.catalogForm select,#catalogSearch{min-width:0;width:100%;min-height:44px;font-size:16px;padding:10px;color:var(--ink);background:white;border:1px solid #becbbf;border-radius:8px}
+.catalogForm p{margin:0;font-size:13px}
+.catalogForm .wideField{grid-column:1/-1}
+.catalogSearchLabel{display:block;margin:16px 0 6px;font-weight:600}
+.catalogItem{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.catalogItem>div{min-width:0}.catalogItem .muted{font-size:13px;margin-top:4px}
+.btn.danger{color:#862f2b;background:#fff8f7;border-color:#ddbab6;min-height:44px}
+.formError{color:#9c2727;font-weight:600}
+#catalogStatus:empty,#dotationStatus:empty{display:none}
+@media(max-width:520px){
+ .tab[data-tab="products"]{display:none}
+ .catalogForm{grid-template-columns:minmax(0,1fr)}
+ .catalogBackup{align-items:stretch;flex-direction:column}.catalogBackup .btn{justify-content:center;text-align:center}
+ .catalogItem{align-items:flex-start;flex-direction:column;gap:10px}.catalogItem .btn{align-self:flex-end}
+ #dotationsTable,#dotationsTable tbody,#dotationsTable tr,#dotationsTable td{display:block;width:100%;white-space:normal}
+ #dotationsTable thead{display:none}#dotationsTable tr{padding:10px 0;border-bottom:1px solid var(--line)}
+ #dotationsTable td{padding:3px 0;border:0}#dotationsTable td:first-child{display:none}
+ #dotationsTable td:nth-child(2)::before{content:"Code "}#dotationsTable td:nth-child(3){font-size:15px;font-weight:700}
+ #dotationsTable td:nth-child(4)::before{content:"Dotation en unités : "}#dotationsTable td:last-child{text-align:right}
+}
+
+/* Saisie EPI sur téléphone et actions sur les sélections. */
+.epiEntryActions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;position:sticky;top:var(--topbar-h,120px);z-index:5;background:var(--card);padding:10px 0;border-bottom:1px solid var(--line)}
+.epiEntryActions .muted{font-size:12px}
+.epiEntryActions .btn{min-height:44px}
+.epiEntryActions .btn:disabled{opacity:.55;box-shadow:none;transform:none}
+.orderActions{margin-top:12px}
+.actionStatus:empty{display:none}
+#orderTable .pendingCode{display:block;white-space:normal;overflow-wrap:normal;font-size:11px;line-height:1.3}
+@media(max-width:520px){
+  .epiInput{font-size:16px;min-height:44px;min-width:0;scroll-margin-top:calc(var(--topbar-h,120px) + 100px)}
+  #epiTable th:nth-child(2),#epiTable th:nth-child(3){width:24%}
+}
+
+/* Light workspace with a persistent top navigation. */
+:root{color-scheme:light;--shadow:0 4px 20px rgba(36,59,53,.035);--accent-soft:#e9f1e9;--focus:#35664d;--bottom-nav-h:0px;--header-h:76px}
+html{scroll-padding-top:calc(var(--topbar-h,76px) + 20px);scroll-padding-bottom:calc(var(--bottom-nav-h) + 20px)}
+body{background:var(--bg);font-size:14px;line-height:1.5;padding-bottom:32px}
+button,input,select{font:inherit}
+button,select,summary{touch-action:manipulation}
+button{cursor:pointer}
+button:disabled{cursor:default}
+button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.title{font-family:"Manrope",system-ui,sans-serif;font-size:25px;letter-spacing:-.7px;line-height:1.3;font-weight:700}
+.subtitle{font-size:13px;line-height:1.55;margin-top:5px}
+.container{max-width:1120px;padding:20px 28px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px max(28px,calc((100vw - 1064px)/2));background:#f7f8f5;border-bottom:0;box-shadow:none;backdrop-filter:none;min-height:76px}
+.brand{gap:11px}.brandTitle{font-size:18px;letter-spacing:-.4px;font-weight:700}.brand .subtitle{font-size:11px;margin:0}
+.logo{width:40px;height:40px;border:0;border-radius:13px;background:var(--accent-soft);color:var(--accent)}
+.logo svg{width:24px;height:24px}.statusBar{font-size:11px;margin:0;max-width:45%;text-align:right;overflow-wrap:anywhere}
+.tabs{position:sticky;top:var(--header-h);z-index:25;border-radius:0;border:0;border-bottom:1px solid var(--line);padding:8px max(28px,calc((100vw - 1064px)/2));margin:0;background:#fff;gap:8px;flex-wrap:nowrap}
+.tab,.menuToggle{display:flex;gap:9px;justify-content:center;align-items:center;min-height:46px;padding:10px 18px;border:0;border-radius:11px;color:var(--muted);background:transparent;font-weight:700;font-size:13px;letter-spacing:0;line-height:1.4;transition:background .15s,color .15s}
+.tab svg,.menuToggle svg{height:21px;width:21px;flex-shrink:0}
+.tab.active,.menuToggle.active{background:var(--accent-soft);color:#315941;box-shadow:none;border:0}
+.tab:hover,.menuToggle:hover{background:#f1f5ef;border:0}
+.tab.active:hover,.menuToggle.active:hover{background:var(--accent-soft);color:#315941}
+.menuWrap{display:block;position:relative;margin-left:auto}
+.menuToggle{min-width:94px}
+.menu{top:calc(100% + 14px);right:0;width:280px;min-width:0;border:1px solid var(--line);border-radius:20px;padding:10px;box-shadow:0 14px 45px rgba(36,59,53,.15);max-height:70vh;overflow-y:auto}
+.menuHeading{padding:8px 12px 6px;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted)}
+.menuDivider{border-top:1px solid var(--line);margin-top:6px;padding-top:14px}
+.menuItem{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:12px;border:0;border-radius:11px;font-size:14px}
+.menuItem>span:last-child{font-size:20px;color:var(--muted)}
+.menuItem:hover,.menuItem.active{background:var(--accent-soft);border:0;color:#315941}
+.panel{margin-top:4px}.card{padding:26px;border-radius:22px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.row{gap:14px}.card>.row.space{align-items:flex-start}.inline{gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.card>.row.space>.inline{max-width:60%}
+.card>.row.space>.inline select{min-width:190px;max-width:100%}
+.btn{min-height:44px;background:var(--accent);border:1px solid var(--accent);box-shadow:none;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;transition:background .15s}
+.btn:hover{transform:none;filter:none;background:#355b48}
+.btn.ghost{background:white;border-color:#d8e2d7;color:#435c4b}.btn.ghost:hover{background:#f3f6f1}
+.btn.danger{background:#fffafa;color:#884b47;border-color:#e8d7d3}.btn.danger:hover{background:#faefec}
+select,input[type="date"]{min-height:44px;border-color:#cdd8cd;border-radius:10px;font-size:14px;padding:10px 12px}
+select:focus,input[type="date"]:focus,.prepInput:focus,#entryTable input[type="number"]:focus{box-shadow:0 0 0 3px rgba(66,106,88,.13)}
+.subtabs{margin-top:22px;gap:4px;padding:4px;background:#f0f3ed;border:0;border-radius:12px;top:calc(var(--topbar-h,76px) + 8px)}
+.subtab{padding:10px 18px;min-height:44px;font-size:13px;color:#586958}
+.subtab.active{color:#315941;border:0;box-shadow:0 1px 4px rgba(36,59,53,.08)}
+.planningClear{margin-left:8px;background:transparent!important;border-color:transparent!important}
+.planningContent{margin-top:22px}
+.planningGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.dayCard{border:1px solid var(--line);border-radius:16px;padding:18px;background:#fff;min-height:0}
+.dayCard:last-child:nth-child(odd){grid-column:1/-1}
+.dayTitle{font-size:16px;letter-spacing:-.3px;margin-bottom:5px}
+.dayMeta{font-size:11px;display:block;margin:0 0 12px;color:var(--muted)}
+.taskItem{font-size:13px;gap:11px;align-items:center;min-height:44px;padding:6px 0;margin:0}
+.taskItem span{line-height:1.55}.taskItem input{width:20px;height:20px;flex-shrink:0;margin:0;accent-color:var(--accent)}
+.taskItem.done{opacity:1}.dayCard.done{background:#f4f8f1;border-color:#c7d8c4}
+.tableWrap{margin-top:20px}.table{font-size:13px}
+.table th,.table td{padding:13px 11px;line-height:1.45;vertical-align:middle}
+.table th{font-size:10px;font-weight:700;letter-spacing:.65px;background:#f0f4ed}
+.table th:first-child{border-radius:9px 0 0 9px}.table th:last-child{border-radius:0 9px 9px 0}
+.table tbody tr:hover{background:#f8faf6}
+.table td:first-child{font-variant-numeric:tabular-nums}
+.orderCategory td{background:#eaf0e7;color:#476149;padding-top:15px;padding-bottom:15px}
+.orderSubcategory td{background:#f5f7f0;color:#596c50;padding-top:12px;padding-bottom:12px}
+#orderTable td:nth-child(2) .orderProduct{display:block;overflow:visible;line-height:1.5}
+.orderCheck{width:24px;height:24px;outline-offset:4px;box-shadow:0 0 0 10px transparent}
+#orderTable td:last-child{height:50px}
+.orderActions{margin-top:16px}
+.prepHeader{background:#f0f4ed;border:0;padding:13px 16px;border-radius:10px;font-size:11px}
+.prepRow{padding:16px;gap:10px;border-radius:14px;margin-bottom:10px;min-height:74px}
+.prepRow:hover{box-shadow:none}.prepRow.done{opacity:1;background:#f7faf4}
+.prepRow.filled{border-color:#b1c9b2;box-shadow:none}
+.prodCell{gap:12px}.codeBadge{font-size:12px;font-weight:700;border:0;border-radius:7px;padding:5px 8px;color:#52654f;background:#f0f4ed}
+.prepRow.filled .codeBadge{background:var(--accent-soft);color:#315941;border:0}
+.prodName{font-size:14px;font-weight:600;line-height:1.45}
+.needCell{font-size:19px;font-weight:700;white-space:normal}.needParen{font-size:11px;display:block;font-weight:400;margin:2px 0 0}
+.prepInput,.epiInput,#entryTable input[type="number"]{font-size:16px;font-weight:600;min-height:44px;border-radius:9px;scroll-margin-top:calc(var(--topbar-h,76px) + 100px);scroll-margin-bottom:calc(var(--bottom-nav-h) + 25px)}
+.checkbox{width:24px;height:24px;margin:10px;vertical-align:middle}
+.prepInput{max-width:110px}.prepRow.filled .prepInput{border-color:#adbfaa}
+.unit{font-weight:400}.footnote{font-size:12px;line-height:1.6;margin-top:18px}
+.backTopWrap{margin-top:22px}.backTopBtn{font-size:12px}
+.managementNav{padding-bottom:0;padding-top:28px}
+.managementNav .title{font-size:23px}
+.managementTabs{display:flex;gap:4px;padding:4px;background:#eaf0e6;border-radius:12px;width:fit-content;margin-top:16px}
+.managementTab{border:0;background:transparent;color:#586958;font-weight:700;font-size:13px;border-radius:9px;min-height:44px;padding:10px 24px}
+.managementTab.active{background:white;color:#315941;box-shadow:0 1px 4px rgba(36,59,53,.06)}
+#tab-products .card>.title,#tab-dotations .card>.row .title{font-size:19px}
+.catalogNotice{font-size:12px;padding:9px 12px;background:#f2f7ef;border-color:#dae6d6;color:#476047}
+.catalogBackup{font-size:12px;gap:8px}.catalogBackup .btn{font-size:12px}
+.catalogEditor{background:#f8faf6;border-color:var(--line);padding:16px;border-radius:14px}
+.catalogEditor summary{min-height:36px;align-content:center;font-size:14px}
+.catalogEditor p{font-size:12px;color:var(--muted)}
+.catalogForm label,.catalogSearchLabel{font-size:13px}
+.catalogForm input,.catalogForm select,#catalogSearch{border-color:#cdd8cd;border-radius:10px}
+.catalogItem{font-size:13px;padding:17px 0}.catalogItem .muted{font-size:11px}.catalogItem .btn{font-size:12px}
+.epiEntryActions{top:var(--topbar-h,76px);padding:10px 0;background:#fff}
+.epiEntryActions .muted{max-width:70%;line-height:1.5}.epiInput{padding:10px 8px}
+.hidden{display:none!important}
+@media(min-width:701px){.tabs .tab{display:flex}}
+@media(max-width:700px){
+  body{padding-bottom:max(20px,env(safe-area-inset-bottom))}
+  .topbar{min-height:70px;padding:12px 18px;gap:12px;border-bottom:1px solid var(--line)}
+  .brandTitle{font-size:17px}.logo{height:36px;width:36px;border-radius:11px}.brand .subtitle{font-size:10px}
+  .statusBar{font-size:10px;max-width:43%}
+  .tabs{position:sticky;top:var(--header-h);bottom:auto;left:auto;right:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;min-height:72px;padding:7px max(6px,env(safe-area-inset-right)) 7px max(6px,env(safe-area-inset-left));border:0;border-bottom:1px solid var(--line);box-shadow:0 5px 20px rgba(36,59,53,.035);z-index:25}
+  .tabs .tab,.menuToggle{width:100%;min-width:0;min-height:57px;display:flex;flex-direction:column;gap:3px;padding:6px 2px;font-size:10px;font-weight:700;border-radius:10px;white-space:nowrap;line-height:1.6}
+  .tabs .tab svg,.menuToggle svg{height:22px;width:22px}
+  .menuWrap{position:static;margin:0;width:100%}
+  .menu{top:calc(100% + 8px);bottom:auto;right:10px;width:min(310px,calc(100vw - 20px));border-radius:18px;max-height:calc(100dvh - var(--topbar-h) - 24px)}
+  .container{padding:16px 12px;max-width:100%;margin:0}
+  .panel{margin-top:0}.card{padding:18px 14px;border-radius:18px}
+  .title{font-size:24px}.subtitle{font-size:12px;margin-top:6px}
+  .card>.row.space{display:flex;flex-direction:column;align-items:stretch;gap:16px}
+  .card>.row.space>.inline{max-width:100%;width:100%;justify-content:flex-start}
+  .row,.inline{flex-wrap:wrap}
+  select{font-size:16px;width:100%;padding:10px 12px;min-height:48px}
+  .card>.row.space>.inline select{flex-basis:100%;width:100%;min-width:0}
+  .btn{font-size:12px;min-height:44px;padding:10px 12px}
+  .subtabs{width:100%;margin-top:20px;gap:3px;align-items:center;flex-wrap:wrap}
+  .subtab{flex:1;padding:10px 9px;min-height:44px;font-size:13px}
+  .planningClear{margin:0;padding:9px 7px;font-size:11px;min-height:44px}
+  .planningGrid{grid-template-columns:minmax(0,1fr);gap:12px}
+  .planningContent{margin-top:18px}.dayCard{padding:16px;border-radius:13px}.dayCard:last-child:nth-child(odd){grid-column:auto}
+  .dayTitle{font-size:16px}.taskItem{font-size:13px;min-height:44px}
+  .table{font-size:12px}.table th,.table td{padding:10px 6px}.table col{width:auto!important;min-width:0}
+  .table th{font-size:9px;letter-spacing:.3px}
+  #orderTable{font-size:12px}
+  #orderTable th,#orderTable td{padding:10px 5px}
+  #orderTable th:nth-child(1),#orderTable td:nth-child(1){width:45px;font-size:11px}
+  #orderTable th:nth-child(3),#orderTable td:nth-child(3){width:48px}
+  #orderTable th:nth-child(4),#orderTable td:nth-child(4){width:44px}
+  #orderTable col:first-child{width:45px!important}#orderTable col:nth-child(3){width:48px!important}#orderTable col:nth-child(4){width:44px!important}
+  #orderTable .orderCategory td,#orderTable .orderSubcategory td{font-size:11px;padding:12px 8px;white-space:normal}
+  .orderCheck{width:24px;height:24px}
+  /* Product cards retain all original inputs and their handlers. */
+  #entryTable,#entryTable tbody{display:block;width:100%}
+  #entryTable thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  #entryTable tbody tr{display:grid;grid-template-columns:52px minmax(0,1fr) 83px;gap:12px 8px;padding:15px 12px;border:1px solid var(--line);border-radius:13px;margin-bottom:10px;background:white;align-items:center}
+  #entryTable td{display:block;border:0;padding:0;width:auto;white-space:normal;text-align:left}
+  #entryTable td:first-child{display:none}
+  #entryTable td:nth-child(2){grid-column:1;width:auto;white-space:nowrap;font-size:11px;font-weight:700;color:#52654f;background:#f0f4ed;border-radius:6px;padding:4px 5px;text-align:center}
+  #entryTable td:nth-child(3){grid-column:2/-1;font-size:13px;font-weight:600;line-height:1.5}
+  #entryTable .entryAmount{grid-column:1/3;display:flex;align-items:center;gap:8px;justify-content:space-between;text-align:left}
+  #entryTable .entryAmount::before{content:attr(data-label);font-size:11px;color:var(--muted);line-height:1.35}
+  #entryTable .entryAmount.unavailable{display:none}
+  #entryTable input[type="number"]{font-size:16px;min-height:46px;width:72px;max-width:72px;padding:8px;text-align:right;flex-shrink:0;font-weight:600}
+  #entryTable .entryResult{grid-column:3;text-align:right;align-self:center;font-size:15px}
+  #entryTable .entryResult::before{content:attr(data-label);display:block;font-size:10px;color:var(--muted);margin-bottom:4px}
+  #entryTable td[colspan]{display:block!important;grid-column:1/-1}
+  .prepWrap{overflow:visible}.prepHeader{display:none!important}
+  .prepRow{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 46px;gap:14px 12px;padding:15px 12px;border-radius:13px;margin-bottom:12px}
+  .prodCell{grid-column:1/-1;gap:9px;align-items:flex-start}.prodName,.prepRow .prodName{font-size:13px;font-weight:600;line-height:1.5}
+  .codeBadge{font-size:11px;padding:4px 6px;line-height:1.5}.needCell{text-align:left;font-size:19px;white-space:normal}
+  .needCell::before,.prepCell::before,.doneCell::before{display:block;font-size:10px;font-weight:400;color:var(--muted);margin-bottom:7px;letter-spacing:0}
+  .needCell::before{content:"À préparer"}.prepCell::before{content:"Préparé"}.doneCell::before{content:"Fait"}
+  .prepCell{text-align:right}.doneCell{align-self:start}
+  .needParen{display:block;white-space:normal;font-size:10px;margin:2px 0 0;font-weight:400}
+  .prepInput{min-height:46px;width:100%;max-width:100%;font-size:16px;padding:10px;font-weight:600}.checkbox{margin:10px 8px}
+  .managementNav{padding:22px 18px 0}.managementNav .title{font-size:23px}
+  .managementTabs{width:100%;margin-top:16px}.managementTab{flex:1;font-size:13px;padding:10px 16px}
+  .catalogForm{grid-template-columns:minmax(0,1fr)}.catalogForm input,.catalogForm select,#catalogSearch{font-size:16px}
+  .catalogBackup{flex-direction:row;align-items:center;gap:8px}.catalogBackup>span{flex-basis:100%}
+  .catalogItem{align-items:flex-start;flex-direction:column;gap:10px}.catalogItem .btn{align-self:flex-end}
+  #dotationsTable,#dotationsTable tbody,#dotationsTable tr,#dotationsTable td{display:block;width:100%;white-space:normal}
+  #dotationsTable thead{display:none}#dotationsTable tr{padding:14px 0;border-bottom:1px solid var(--line)}
+  #dotationsTable td{padding:4px 0;border:0}#dotationsTable td:first-child{display:none}
+  #dotationsTable td:nth-child(2)::before{content:"Code "}#dotationsTable td:nth-child(3){font-size:14px;font-weight:600}
+  #dotationsTable td:nth-child(4)::before{content:"Dotation en unités : "}#dotationsTable td:last-child{text-align:right}
+  .epiEntryActions{align-items:center;gap:8px}.epiEntryActions .muted{font-size:11px;max-width:55%}.epiEntryActions .btn{font-size:11px;padding:10px 8px}
+  #epiTable{table-layout:fixed;font-size:11px}#epiTable th{white-space:normal}#epiTable th:nth-child(1){width:34%}#epiTable th:nth-child(2),#epiTable th:nth-child(3){width:24%}#epiTable th:nth-child(4){width:18%}
+  #epiTable td,#epiTable th{padding:10px 4px}.epiInput{font-size:16px;min-height:46px;min-width:0;padding:8px 5px}
+  .footnote{font-size:11px}.backTopWrap{margin-top:20px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* Discreet catalogue actions; deletion still requires confirmation. */
+.statusBar:empty{display:none}
+.statusBar{font-size:12px}
+.catalogDelete{align-self:center;flex-shrink:0;min-height:32px;padding:4px 8px;margin-left:12px;border:1px solid transparent;border-radius:6px;background:transparent;color:#805651;font-size:11px;font-weight:400;line-height:1.4}
+.catalogDelete:hover{background:#faf1ef;border-color:#eadbd7;color:#793f39}
+.catalogDelete:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+@media(max-width:700px){.catalogDelete{align-self:flex-end;margin-left:0}.topbar{flex-wrap:wrap}.statusBar{max-width:100%;text-align:left;font-size:12px}}
+
+/* Editing is explicit; the normal weekly checklist remains uncluttered. */
+.planningFooter{display:flex;justify-content:flex-end;border-top:1px solid var(--line);padding-top:20px;margin-top:26px}
+#planningManage[aria-expanded="true"]{color:white;background:var(--accent);border-color:var(--accent)}
+#planningManage:disabled,#planningClear:disabled{opacity:.5;cursor:default}
+.planningEditor{padding:18px;margin-top:20px;border:1px solid var(--line);border-radius:14px;background:#f7faf4}
+.planningEditorTitle{font-size:14px;font-weight:700}
+.planningTaskForm{display:grid;grid-template-columns:minmax(0,1fr) 150px auto;gap:12px;margin-top:14px;align-items:end}
+.planningTaskForm label{display:flex;flex-direction:column;gap:6px;min-width:0;font-size:12px;font-weight:600}
+.planningTaskForm input{width:100%;min-width:0;min-height:44px;border:1px solid #cdd8cd;border-radius:10px;padding:10px 12px;font-size:16px;color:var(--ink);background:#fff}
+.planningTaskForm select{width:100%;min-width:0;font-size:16px}
+.planningEditor p{font-size:12px;line-height:1.6;margin:12px 0 0}
+.planningTask{scroll-margin-top:calc(var(--topbar-h,142px) + 75px)}
+.planningEmpty{font-size:13px;margin:8px 0}
+.isEditing .planningTask{padding:12px 0;border-top:1px solid var(--line)}
+.isEditing .taskItem{font-size:13px;padding-top:2px;padding-bottom:10px;min-height:44px}
+.planningTaskTools{display:grid;gap:9px}
+.planningTaskOrder{display:flex;align-items:center;gap:8px}
+.planningArrow{min-width:44px;min-height:44px;border:1px solid #d8e2d7;border-radius:9px;background:white;color:#435c4b;font-size:20px;line-height:1}
+.planningArrow:disabled{opacity:.35;cursor:default}
+.planningArrow:not(:disabled):hover{background:var(--accent-soft)}
+.planningDelete{margin-left:auto;min-height:32px;border:1px solid transparent;border-radius:6px;background:transparent;color:#805651;font-size:11px;padding:4px 8px}
+.planningDelete:hover{border-color:#eadbd7;background:#faf1ef}
+.planningTaskMove{display:flex;align-items:center;gap:8px}
+.planningTaskMove select{flex:1;min-width:0;width:100%;font-size:16px}
+.planningTaskMove .btn{flex-shrink:0;min-width:90px}
+.planningTaskMove .btn:disabled{opacity:.45;cursor:default;background:white}
+@media(max-width:700px){
+  #planningManage{align-self:flex-start}
+  .planningEditor{padding:14px}
+  .planningTaskForm{grid-template-columns:minmax(0,1fr) auto;gap:12px 8px}
+  .planningNameField{grid-column:1/-1}
+  .planningTaskForm .btn{min-height:48px}
+  .planningTaskMove .btn{min-height:48px}
+}
+
+/* EPI: product references below names and clearing kept below the list. */
+.epiProductCode{display:block;margin-top:4px;font-size:11px;font-weight:400;line-height:1.5;color:var(--muted);overflow-wrap:normal;word-break:normal}
+.epiFooter{display:flex;justify-content:flex-end;margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}
+.epiEntryActions{justify-content:flex-end}

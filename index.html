@@ -2,50 +2,48 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Magasin</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f8f5" />
+  <meta name="color-scheme" content="light" />
+  <title>Magasin CHLB</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20260926-epi-list" />
 </head>
 <body>
 
   <header class="topbar">
     <div class="brand">
-      <div class="logo">📦</div>
-      <div>
-        <div class="title">Magasin</div>
-        <div class="subtitle"></div>
-      </div>
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M7 9H4a1 1 0 0 0-1 1v11h18V10a1 1 0 0 0-1-1h-3M10 21v-5h4v5M12 6v6m-3-3h6"/></svg></div>
+      <div><div class="brandTitle">Magasin CHLB</div><div class="subtitle">Hôpital &amp; EHPAD</div></div>
     </div>
-
-    <div class="tabs">
-      <!-- 🔥 Onglets Produits & Services retirés de l'UI (mais code conservé) -->
-      <!-- <button class="tab" data-tab="products">Produits</button> -->
-      <!-- <button class="tab" data-tab="services">Services</button> -->
-
-      <button class="tab active" data-tab="planning">Planning</button>
-      <button class="tab" data-tab="epi">EPI</button>
-      <button class="tab" data-tab="order">Commande</button>
-      <button class="tab" data-tab="dotations">Dotations</button>
-      <button class="tab" data-tab="entry">Complément</button>
-      <button class="tab" data-tab="prep">Prépar.</button>
-      <button class="tab" data-tab="consumption">Consommation</button>
-
-      <div class="menuWrap">
-        <button class="menuToggle" id="moreMenuToggle" aria-haspopup="true" aria-expanded="false">...</button>
-        <div class="menu" id="moreMenu">
-          <button class="menuItem" data-tab="epi">EPI</button>
-          <button class="menuItem" data-tab="order">Commande</button>
-          <button class="menuItem" data-tab="dotations">Dotations</button>
-          <button class="menuItem" data-tab="consumption">Consommation</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="statusBar muted" id="productsLoadStatus"></div>
+    <div class="statusBar muted" id="productsLoadStatus" role="status"></div>
   </header>
+
+  <nav class="tabs" aria-label="Navigation principale">
+    <button type="button" class="tab active" data-tab="planning" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4m8-4v4M4 11h16m-11 5h2"/></svg><span>Planning</span></button>
+    <button type="button" class="tab" data-tab="entry" aria-label="Complémentation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m8 14 3 3 5-6"/></svg><span>Complément</span></button>
+    <button type="button" class="tab" data-tab="prep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l3 12h10l3-9H6m4 13h.01M18 20h.01"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span>Préparation</span></button>
+    <div class="menuWrap">
+      <button type="button" class="menuToggle" id="moreMenuToggle" aria-controls="moreMenu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg><span>Plus</span></button>
+      <div class="menu" id="moreMenu">
+        <div class="menuHeading">Chaque semaine</div>
+        <button type="button" class="menuItem" data-tab="order"><span>Commande</span><span aria-hidden="true">›</span></button>
+        <button type="button" class="menuItem" data-tab="epi"><span>EPI</span><span aria-hidden="true">›</span></button>
+        <div class="menuHeading menuDivider">Mes produits</div>
+        <button type="button" class="menuItem" data-tab="products"><span>Gestion des produits</span><span aria-hidden="true">›</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="managementNav" class="managementNav container hidden">
+    <div class="title">Gestion des produits</div>
+    <nav class="managementTabs" aria-label="Gestion des produits">
+      <button type="button" class="managementTab" data-tab="products">Catalogue</button>
+      <button type="button" class="managementTab" data-tab="dotations">Dotations</button>
+    </nav>
+  </div>
 
   <!-- ========== PANELS ========== -->
   <!-- Planning -->
@@ -57,15 +55,28 @@
             <div class="title">Planning</div>
             <div class="subtitle muted">Tâches hebdomadaires par service</div>
           </div>
+          <button type="button" class="btn ghost" id="planningManage" aria-expanded="false" aria-controls="planningEditor planningContent">Gérer mon planning</button>
         </div>
 
         <div class="subtabs">
           <button class="subtab active" data-plan="hospital">Hôpital</button>
           <button class="subtab" data-plan="ehpad">EHPAD</button>
-          <button class="btn ghost planningClear" id="planningClear">Tout décocher</button>
         </div>
 
+        <p id="planningStatus" class="actionStatus muted" role="status" aria-live="polite"></p>
+        <div id="planningEditor" class="planningEditor hidden">
+          <div id="planningEditSite" class="planningEditorTitle">Ajouter une tâche — Hôpital</div>
+          <form id="planningTaskForm" class="planningTaskForm">
+            <label class="planningNameField">Tâche<input id="planningTaskName" maxlength="200" required placeholder="Nom de la tâche" /></label>
+            <label>Jour<select id="planningTaskDay"><option value="Lundi">Lundi</option><option value="Mardi">Mardi</option><option value="Mercredi">Mercredi</option><option value="Jeudi">Jeudi</option><option value="Vendredi">Vendredi</option></select></label>
+            <button type="submit" class="btn">Ajouter</button>
+          </form>
+          <p class="muted">Les flèches changent l’ordre. Choisis un autre jour pour déplacer une tâche. Les modifications sont enregistrées automatiquement.</p>
+        </div>
         <div id="planningContent" class="planningContent"></div>
+        <div class="planningFooter">
+          <button type="button" class="btn ghost" id="planningClear">Tout décocher</button>
+        </div>
       </div>
     </div>
   </section>
@@ -79,6 +90,9 @@
             <div class="title">EPI</div>
             <div class="subtitle muted">Suivi des stocks</div>
           </div>
+        </div>
+        <div class="epiEntryActions">
+          <button type="button" id="epiNext" class="btn ghost" disabled>Ligne suivante ↓</button>
         </div>
 
         <div class="tableWrap">
@@ -100,6 +114,10 @@
             <tbody></tbody>
           </table>
         </div>
+        <div class="epiFooter">
+          <button type="button" id="epiClear" class="btn danger">Effacer toutes les saisies</button>
+        </div>
+        <p id="epiStatus" class="actionStatus muted" role="status" aria-live="polite"></p>
       </div>
     </div>
   </section>
@@ -111,7 +129,7 @@
         <div class="row space">
           <div>
             <div class="title">Commande</div>
-            <div class="subtitle muted">Seuils + sélection à commander</div>
+            <div class="subtitle muted">Quantités et produits à commander</div>
           </div>
         </div>
 
@@ -119,6 +137,10 @@
           <button class="subtab active" data-order="hospital">Hôpital</button>
           <button class="subtab" data-order="ehpad">EHPAD</button>
         </div>
+        <div class="row orderActions">
+          <button type="button" id="orderClear" class="btn danger">Tout décocher</button>
+        </div>
+        <p id="orderStatus" class="actionStatus muted" role="status" aria-live="polite"></p>
 
         <div class="tableWrap orderTableWrap">
           <table class="table" id="orderTable">
@@ -162,35 +184,29 @@
     </div>
   </section>
 
-  <!-- (Cachés) Produits / Services : conservés dans le code -->
+  <!-- Catalogue commun aux dotations et aux commandes -->
   <section id="tab-products" class="panel hidden">
-    <div class="container">
-      <div class="card">
-        <div class="row space">
-          <div>
-            <div class="title">Produits</div>
-            <div class="subtitle muted" id="productsCount"></div>
-          </div>
-        </div>
-        <div class="tableWrap">
-          <table class="table" id="productsTable">
-            <colgroup>
-              <col style="width:110px" />
-              <col />
-              <col style="width:140px" />
-              <col style="width:90px" />
-              <col style="width:90px" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Code</th><th>Nom</th><th>Catégorie</th><th>U/carton</th><th>U/pack</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    <div class="container"><div class="card">
+      <div class="title">Catalogue</div>
+      <p id="catalogStatus" role="status" aria-live="polite"></p>
+      <details class="catalogEditor">
+        <summary>Ajouter un produit</summary>
+        <form id="catalogForm" class="catalogForm">
+          <label>Code produit<input id="catalogCode" required maxlength="40" autocomplete="off" /></label>
+          <label class="wideField">Nom du produit<input id="catalogName" required maxlength="200" /></label>
+          <label>Présentation<select id="catalogCategory"><option value="Petit">À l’unité</option><option value="Pack">Paquet / boîte / rouleau</option><option value="Cartons">Carton</option></select></label>
+          <label>Unités par paquet<input id="catalogPack" type="number" min="0" step="1" value="0" inputmode="numeric" required /></label>
+          <label>Unités par carton<input id="catalogCarton" type="number" min="0" step="1" value="0" inputmode="numeric" required /></label>
+          <label>Afficher dans Commande<select id="catalogSites" required><option value="">Choisir…</option><option value="hospital">Hôpital</option><option value="ehpad">EHPAD</option><option value="both">Hôpital et EHPAD</option><option value="none">Aucun</option></select></label>
+          <p class="wideField muted">Laisse 0 pour un produit à l’unité.</p>
+          <button type="submit" class="btn">Ajouter</button>
+        </form>
+      </details>
+      <label class="catalogSearchLabel" for="catalogSearch">Rechercher par code ou par nom</label>
+      <input id="catalogSearch" type="search" placeholder="Ex. : 3218, surodorant…" />
+      <p class="muted" id="productsCount"></p>
+      <div id="catalogList"></div>
+    </div></div>
   </section>
 
   <section id="tab-services" class="panel hidden">
@@ -220,24 +236,37 @@
         <div class="row space">
           <div>
             <div class="title">Dotations</div>
-            <div class="subtitle muted">Ordre respecté (dotations_order.json)</div>
+            <div class="subtitle muted">Produits et quantités prévus pour chaque réserve</div>
           </div>
           <div class="inline">
-            <select id="d_service"></select>
+            <select id="d_service" aria-label="Réserve à modifier"></select>
           </div>
         </div>
 
+        <details class="catalogEditor">
+          <summary>Ajouter un produit à cette réserve</summary>
+          <form id="dotationAddForm" class="catalogForm">
+            <label class="wideField">Rechercher dans le catalogue<input id="d_product_search" type="search" placeholder="Code ou nom du produit" /></label>
+            <label class="wideField">Produit du catalogue<select id="d_product" required><option value="">Choisir un produit…</option></select></label>
+            <p class="wideField muted" id="d_product_count"></p>
+            <label>Dotation en unités<input id="d_quantity" type="number" min="1" step="1" value="1" inputmode="numeric" required /></label>
+            <button type="submit" class="btn">Ajouter à cette réserve</button>
+          </form>
+          <button type="button" class="btn ghost" data-open-catalog>Produit absent ? Ouvrir le catalogue</button>
+          <p class="muted">Enregistrement automatique sur cet appareil. Les ajouts apparaissent aussi dans Complément.</p>
+        </details>
+        <p id="dotationStatus" role="status" aria-live="polite"></p>
         <div class="tableWrap">
           <table class="table" id="dotationsTable">
             <thead>
-              <tr><th>#</th><th>Code</th><th>Produit</th><th>Qté</th><th class="muted">Unt</th></tr>
+              <tr><th>#</th><th>Code</th><th>Produit</th><th>Dotation (unités)</th><th class="muted">Équivalent</th><th>Action</th></tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
 
         <div class="footnote muted">
-          La dotation est stockée en unités dans dotations.json.
+          La quantité indique le stock prévu dans la réserve, en unités.
         </div>
       </div>
     </div>
@@ -249,13 +278,12 @@
       <div class="card">
         <div class="row space">
           <div>
-            <div class="title">Complément</div>
-            <div class="subtitle muted">Tu saisis uniquement Pack si U/pack > 0, sinon Unités</div>
+            <div class="title">Complémentation</div>
+            <div class="subtitle muted">Indique le stock restant dans la réserve.</div>
           </div>
           <div class="inline">
-            <select id="e_service"></select>
-            <button class="btn ghost" id="toggleFullscreenEntry">🔍 Plein écran</button>
-            <button class="btn ghost" id="clearEntry">🧹 Vider saisie</button>
+            <select id="e_service" aria-label="Réserve à compléter"></select>
+            <button class="btn ghost" id="clearEntry">Vider la saisie</button>
           </div>
         </div>
 
@@ -294,20 +322,19 @@
       <div class="card">
         <div class="row space">
           <div>
-            <div class="title">Prépar.</div>
+            <div class="title">Préparation</div>
             <div class="subtitle muted" id="prepSummary"></div>
           </div>
 
           <div class="inline">
-            <select id="p_service"></select>
-            <button class="btn ghost" id="checkAll">✅ Tout cocher</button>
-            <button class="btn ghost" id="uncheckAll">↩︎ Tout décocher</button>
+            <select id="p_service" aria-label="Réserve à préparer"></select>
+            <button class="btn ghost" id="checkAll">Tout cocher</button>
+            <button class="btn ghost" id="uncheckAll">Tout décocher</button>
           </div>
         </div>
 
         <div class="row" style="margin-top:10px; gap:8px;">
-          <button class="btn" id="closeSave">✅ Clôturer + sauvegarder</button>
-          <button class="btn ghost" id="closeNoSave">🧹 Vider sans sauvegarder</button>
+          <button class="btn ghost" id="closeNoSave">Vider</button>
         </div>
 
         <div class="tableWrap prepWrap">
@@ -320,10 +347,6 @@
           <div id="prepList" class="prepList"></div>
         </div>
 
-          <div class="footnote muted">
-            Clôturer + sauvegarder = enregistre la consommation (historique) puis remet à zéro saisie/prépa pour le service.
-          </div>
-
           <div class="backTopWrap">
             <button class="btn ghost backTopBtn" type="button" data-back-top aria-label="Remonter en haut">
               ↑ Haut de page
@@ -333,65 +356,7 @@
       </div>
     </section>
 
-  <!-- Consommation -->
-  <section id="tab-consumption" class="panel hidden">
-    <div class="container">
-      <div class="card">
-        <div class="row space">
-          <div>
-            <div class="title">Consommation</div>
-            <div class="subtitle muted">Semaine / Mois • Tous services réunis</div>
-          </div>
-
-          <div class="inline" style="flex-wrap:wrap;">
-            <select id="c_mode">
-              <option value="week">Semaine</option>
-              <option value="month">Mois</option>
-            </select>
-            <input id="c_date" type="date" />
-            <button class="btn ghost" id="c_export">Exporter CSV</button>
-            <button class="btn ghost" id="c_clear">Effacer historique</button>
-          </div>
-        </div>
-
-        <div class="footnote muted" id="c_range"></div>
-
-        <div class="tableWrap">
-          <table class="table" id="c_table_products">
-            <colgroup>
-              <col style="width:100px" />
-              <col />
-              <col style="width:110px" />
-            </colgroup>
-            <thead>
-              <tr><th>Code</th><th>Produit</th><th>Total (u)</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-
-        <div class="tableWrap">
-          <table class="table" id="c_table_services">
-            <colgroup>
-              <col />
-              <col style="width:110px" />
-            </colgroup>
-            <thead>
-              <tr><th>Service</th><th>Total (u)</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Bandeau rappel SAISIE -->
-  <div id="entryReminder" class="stickyReminder hidden">
-    <strong>Rappel :</strong> prévoir les feuilles épicerie et diététiques.
-  </div>
-
-  <script src="app.js"></script>
+  <script src="catalog-management.js?v=20260926-chlb-menu"></script>
+  <script src="app.js?v=20260926-quantity-1769"></script>
 </body>
 </html>
